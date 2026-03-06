@@ -1,34 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout</title>
+  <title>Paiement</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <nav>
     <div class="nav-brand">
-      <a href="/" style="color: white; text-decoration: none;"><h1>🛍️ Shop</h1></a>
+      <a href="/">
+        <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
+      </a>
     </div>
     
     <div class="nav-search">
       <form action="/" method="GET">
-        <input type="text" name="search" placeholder="Search products..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
         <button type="submit">🔍</button>
       </form>
     </div>
 
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <ul id="navMenu">
-      <li><a href="/">Home</a></li>
+      <li><a href="/">Accueil</a></li>
       <% if (user) { %>
-        <li><a href="/user/account">Account</a></li>
-        <li><a href="/cart">Cart</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
+        <li><a href="/user/account">Compte</a></li>
+        <li><a href="/cart">Panier</a></li>
+        <li><a href="/auth/logout">Déconnexion</a></li>
       <% } else { %>
-        <li><a href="/auth/login-page">Login</a></li>
-        <li><a href="/auth/register-page">Register</a></li>
+        <li><a href="/auth/login-page">Connexion</a></li>
+        <li><a href="/auth/register-page">Inscription</a></li>
       <% } %>
     </ul>
   </nav>
@@ -38,16 +40,19 @@
       const menu = document.getElementById('navMenu');
       menu.classList.toggle('active');
     }
+    
+    lucide.createIcons();
   </script>
 
   <main>
     <div class="checkout-container">
-      <h2>Checkout</h2>
+      <h2>Paiement</h2>
+      <script src="https://unpkg.com/lucide@latest"></script>
       
       <% if (message) { %>
         <div class="success-message"><%= message %></div>
-        <% if (message.includes('Order placed')) { %>
-          <a href="/" class="btn">Back to Shop</a>
+        <% if (message.includes('Commande passée')) { %>
+          <a href="/" class="btn">Retourner à la boutique</a>
         <% } else { %>
       <% } %>
       <% } %>
@@ -55,48 +60,97 @@
       <% if (cartItems.length > 0) { %>
         <div class="checkout-content">
           <div class="order-summary">
-            <h3>Order Summary</h3>
+            <h3>Résumé de la commande</h3>
+            <h4 class="phone-title">Numéro téléphone:</h4>
+            <div class="phone-numbers">
+              <div class="phone-item">
+                <i data-lucide="phone"></i>
+                <span>032 59 25 712</span>
+              </div>
+              <div class="phone-item">
+                <i data-lucide="phone"></i>
+                <span>034 71 33 317</span>
+              </div>
+              <div class="phone-item">
+                <i data-lucide="phone"></i>
+                <span>033 12 88 367</span>
+              </div>
+            </div>
             <div class="summary-items">
               <% cartItems.forEach(item => { %>
                 <div class="summary-item">
                   <span><%= item.name %> (x<%= item.quantity %>)</span>
-                  <span>$<%= (item.price * item.quantity).toFixed(2) %></span>
+                  <span>Ar<%= (item.price * item.quantity).toFixed(2) %></span>
                 </div>
               <% }); %>
             </div>
+            <div class="summary-subtotal">
+              <span>Sous-total : </span>
+              <span>Ar<%= total.toFixed(2) %></span>
+            </div>
+            <% if (typeof discountPercent !== 'undefined' && discountPercent > 0) { %>
+            <div class="summary-discount">
+              <span>
+                <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
+                Réduction première commande (<%= discountPercent %>%) :
+              </span>
+              <span>- Ar<%= discountAmount.toFixed(2) %></span>
+            </div>
+            <% } %>
+            <div class="summary-shipping">
+              <span>
+                <% if (shippingFee === 0) { %>
+                  <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
+                  Frais de livraison (Offert dès 200 000 Ar) :
+                <% } else { %>
+                  Frais de livraison :
+                <% } %>
+              </span>
+              <span class="<%= shippingFee === 0 ? 'shipping-free' : '' %>">
+                <% if (shippingFee === 0) { %>
+                  GRATUITE
+                <% } else { %>
+                  Ar<%= shippingFee.toFixed(2) %>
+                <% } %>
+              </span>
+            </div>
             <div class="summary-total">
-              <strong>Total: $<%= total.toFixed(2) %></strong>
+              <strong>Total : Ar<%= (total - (typeof discountAmount !== 'undefined' ? discountAmount : 0) + shippingFee).toFixed(2) %></strong>
             </div>
           </div>
 
           <form method="POST" action="/checkout/place-order" class="checkout-form">
             <fieldset>
-              <legend>Shipping Information</legend>
+              <legend>Informations de livraison</legend>
               
               <div class="form-group">
-                <label for="address">Address:</label>
+                <label for="address">Adresse :</label>
                 <input type="text" id="address" name="address" required>
               </div>
 
               <div class="form-group">
-                <label for="city">City:</label>
+                <label for="city">Ville :</label>
                 <input type="text" id="city" name="city" required>
               </div>
 
               <div class="form-group">
-                <label for="state">State:</label>
+                <label for="state">Province :</label>
                 <input type="text" id="state" name="state" required>
               </div>
 
               <div class="form-group">
-                <label for="zip">Zip Code:</label>
+                <label for="zip">Code postal :</label>
                 <input type="text" id="zip" name="zip" required>
+              </div>
+              <div class="form-group">
+                <label for="phone">Numéro téléphone :</label>
+                <input type="tel" id="phone" name="phone" placeholder="032 59 25 712" pattern="[0-9]{10}" required>
               </div>
             </fieldset>
 
             <div class="form-actions">
-              <a href="/cart" class="btn">Back to Cart</a>
-              <button type="submit" class="btn btn-primary">Place Order</button>
+              <a href="/cart" class="btn">Retourner au panier</a>
+              <button type="submit" class="btn btn-primary">Passer la commande</button>
             </div>
           </form>
         </div>
@@ -135,6 +189,38 @@
       height: fit-content;
     }
 
+    .phone-title {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 0.75rem;
+    }
+
+    .phone-numbers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .phone-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.95rem;
+    }
+
+    .phone-item i {
+      width: 18px;
+      height: 18px;
+      color: #28a745;
+    }
+
     .summary-items {
       margin: 1rem 0;
       border-bottom: 1px solid #ddd;
@@ -151,6 +237,51 @@
       padding: 1rem 0;
       text-align: right;
       font-size: 1.3rem;
+      border-top: 2px solid #28a745;
+      margin-top: 1rem;
+      padding-top: 1rem;
+    }
+
+    .summary-subtotal,
+    .summary-shipping {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .summary-discount {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      color: #28a745;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+      border-radius: 6px;
+      margin: 0.5rem 0;
+      border: 1px dashed #28a745;
+    }
+
+    .summary-discount span:first-child {
+      display: flex;
+      align-items: center;
+    }
+
+    .summary-shipping {
+      color: #28a745;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(40, 167, 69, 0.05) 0%, rgba(40, 167, 69, 0.02) 100%);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin: 0.5rem 0;
+    }
+
+    .summary-shipping .shipping-free {
+      color: #28a745;
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
     .checkout-form {

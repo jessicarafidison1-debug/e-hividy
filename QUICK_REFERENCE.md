@@ -223,7 +223,7 @@ npm list                # Show installed packages
 
 ```powershell
 # Navigate to project
-cd c:\xampp\htdocs\e-hividy
+cd c:\xampp\htdocs\Myeva creation
 
 # List files
 dir

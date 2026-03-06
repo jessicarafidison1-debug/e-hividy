@@ -1,20 +1,20 @@
-<%- include('partials/head', { title: 'Products' }) %>
+<%- include('partials/head', { title: 'Produits' }) %>
 <%- include('partials/sidebar', { activePage: 'products' }) %>
 
 <main class="admin-main">
   <div class="page-header">
     <div>
-      <h1><i data-lucide="package"></i> Products</h1>
-      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Manage your product catalog and inventory</p>
+      <h1><i data-lucide="package"></i> Produits</h1>
+      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Gérez votre catalogue de produits et votre inventaire</p>
     </div>
     <div class="page-header-actions">
       <a href="/admin/products/add" class="admin-btn">
-        <i data-lucide="plus-circle"></i> Add Product
+        <i data-lucide="plus-circle"></i> Ajouter un produit
       </a>
     </div>
   </div>
 
-  <!-- Products Card -->
+  <!-- Carte des produits -->
   <div class="card">
     <div class="card-body" style="padding: 0;">
       <% if (typeof error !== 'undefined' && error) { %>
@@ -24,22 +24,22 @@
       <% } %>
 
       <% if (products && products.length > 0) { %>
-        <!-- Products Summary -->
+        <!-- Résumé des produits -->
         <div class="products-summary">
           <div class="summary-item">
-            <span class="summary-label">Total Products</span>
+            <span class="summary-label">Produits totaux</span>
             <span class="summary-value"><%= products.length %></span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">In Stock</span>
+            <span class="summary-label">En stock</span>
             <span class="summary-value text-success"><%= products.filter(p => p.stock > 10).length %></span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">Low Stock</span>
+            <span class="summary-label">Stock faible</span>
             <span class="summary-value text-warning"><%= products.filter(p => p.stock > 0 && p.stock <= 10).length %></span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">Out of Stock</span>
+            <span class="summary-label">En rupture de stock</span>
             <span class="summary-value text-danger"><%= products.filter(p => p.stock === 0).length %></span>
           </div>
         </div>
@@ -48,10 +48,10 @@
           <table class="table">
             <thead>
               <tr>
-                <th style="width: 60px;">Product</th>
-                <th>Product Info</th>
-                <th style="width: 120px;">Price</th>
-                <th style="width: 150px;">Stock Status</th>
+                <th style="width: 60px;">Produit</th>
+                <th>Informations du produit</th>
+                <th style="width: 120px;">Prix</th>
+                <th style="width: 150px;">État du stock</th>
                 <th style="width: 100px; text-align: right;">Actions</th>
               </tr>
             </thead>
@@ -79,23 +79,23 @@
                     </div>
                   </td>
                   <td>
-                    <span class="price-tag">$<%= parseFloat(product.price).toFixed(2) %></span>
+                    <span class="price-tag">Ar<%= parseFloat(product.price).toFixed(2) %></span>
                   </td>
                   <td>
                     <% if (product.stock > 10) { %>
                       <span class="status-badge status-success">
                         <i data-lucide="check-circle"></i>
-                        <%= product.stock %> in stock
+                        <%= product.stock %> en stock
                       </span>
                     <% } else if (product.stock > 0) { %>
                       <span class="status-badge status-warning">
                         <i data-lucide="alert-circle"></i>
-                        Only <%= product.stock %> left
+                        Seulement <%= product.stock %> restant(s)
                       </span>
                     <% } else { %>
                       <span class="status-badge status-danger">
                         <i data-lucide="x-circle"></i>
-                        Out of stock
+                        Rupture de stock
                       </span>
                     <% } %>
                   </td>
@@ -103,13 +103,13 @@
                     <div class="action-buttons" style="justify-content: flex-end;">
                       <a href="/admin/products/edit/<%= product.id %>"
                          class="btn-action btn-action-edit"
-                         title="Edit Product">
-                        <i data-lucide="edit-2"></i>
+                         title="Modifier le produit">
+                        Modifier
                       </a>
                       <button class="btn-action btn-action-delete"
                               onclick="deleteProduct('<%= product.id %>', '<%= product.name %>')"
-                              title="Delete Product">
-                        <i data-lucide="trash-2"></i>
+                              title="Supprimer le produit">
+                        Supprimer
                       </button>
                     </div>
                   </td>
@@ -120,13 +120,10 @@
         </div>
       <% } else { %>
         <div class="empty-state">
-          <div class="empty-state-icon-wrapper">
-            <i data-lucide="package" class="empty-state-icon"></i>
-          </div>
-          <h3>No Products Yet</h3>
-          <p>Start building your catalog by adding your first product</p>
+          <h3>Aucun produit pour le moment</h3>
+          <p>Commencez à construire votre catalogue en ajoutant votre premier produit</p>
           <a href="/admin/products/add" class="admin-btn">
-            <i data-lucide="plus-circle"></i> Add First Product
+            <i data-lucide="plus-circle"></i> Ajouter le premier produit
           </a>
         </div>
       <% } %>
@@ -138,22 +135,22 @@
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <div class="modal-header">
-      <h3><i data-lucide="alert-triangle"></i> Delete Product</h3>
+      <h3><i data-lucide="alert-triangle"></i> Supprimer le produit</h3>
       <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <p>Are you sure you want to delete <strong style="color: var(--primary);"><span id="deleteProductName"></span></strong>?</p>
+      <p>Êtes-vous sûr de vouloir supprimer <strong style="color: var(--primary);"><span id="deleteProductName"></span></strong> ?</p>
       <p style="margin-top: 1rem; color: var(--danger); font-size: 0.875rem;">
         <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
-        This action cannot be undone. All associated data will be permanently removed.
+        Cette action ne peut pas être annulée. Toutes les données associées seront définitivement supprimées.
       </p>
     </div>
     <div class="modal-footer">
       <button class="admin-btn admin-btn-secondary" onclick="closeDeleteModal()">
-        <i data-lucide="x"></i> Cancel
+        <i data-lucide="x"></i> Annuler
       </button>
       <button class="admin-btn admin-btn-danger" id="confirmDeleteBtn">
-        <i data-lucide="trash-2"></i> Delete Product
+        <i data-lucide="trash-2"></i> Supprimer le produit
       </button>
     </div>
   </div>
@@ -234,10 +231,10 @@
       fetch('/admin/products/delete/' + deleteProductId, { method: 'POST' })
         .then(r => r.json())
         .then(data => {
-          if (data.success) { showToast('Product deleted successfully', 'success'); setTimeout(() => location.reload(), 1000); }
-          else { showToast('Error deleting product: ' + (data.error || 'Unknown error'), 'error'); }
+          if (data.success) { showToast('Produit supprimé avec succès', 'success'); setTimeout(() => location.reload(), 1000); }
+          else { showToast('Erreur lors de la suppression du produit : ' + (data.error || 'Unknown error'), 'error'); }
         })
-        .catch(err => { showToast('Error: ' + err.message, 'error'); });
+        .catch(err => { showToast('Erreur : ' + err.message, 'error'); });
       closeDeleteModal();
     }
   });

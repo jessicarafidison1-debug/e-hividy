@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Truck body -->
+  <rect x="8" y="24" width="28" height="16" fill="#FF6B6B" rx="2"/>
+  <!-- Truck cabin -->
+  <rect x="36" y="24" width="12" height="16" fill="#FF5252" rx="2"/>
+  <!-- Truck window -->
+  <rect x="38" y="26" width="8" height="8" fill="#87CEEB"/>
+  <!-- Front wheel -->
+  <circle cx="16" cy="42" r="6" fill="#333"/>
+  <circle cx="16" cy="42" r="3" fill="#666"/>
+  <!-- Back wheel 1 -->
+  <circle cx="36" cy="42" r="6" fill="#333"/>
+  <circle cx="36" cy="42" r="3" fill="#666"/>
+  <!-- Back wheel 2 -->
+  <circle cx="44" cy="42" r="6" fill="#333"/>
+  <circle cx="44" cy="42" r="3" fill="#666"/>
+  <!-- Bumper -->
+  <rect x="36" y="40" width="12" height="2" fill="#333"/>
+</svg>

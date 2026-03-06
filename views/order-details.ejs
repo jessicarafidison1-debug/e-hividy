@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Details</title>
+  <title>Détails de la commande</title>
   <link rel="stylesheet" href="/style.css">
   <style>
     .order-container {
@@ -135,26 +135,28 @@
 <body>
   <nav>
     <div class="nav-brand">
-      <a href="/" style="color: white; text-decoration: none;"><h1>🛍️ Shop</h1></a>
+      <a href="/">
+        <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
+      </a>
     </div>
     
     <div class="nav-search">
       <form action="/" method="GET">
-        <input type="text" name="search" placeholder="Search products..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
         <button type="submit">🔍</button>
       </form>
     </div>
 
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <ul id="navMenu">
-      <li><a href="/">Home</a></li>
+      <li><a href="/">Accueil</a></li>
       <% if (user) { %>
-        <li><a href="/user/account">Account</a></li>
-        <li><a href="/cart">Cart</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
+        <li><a href="/user/account">Compte</a></li>
+        <li><a href="/cart">Panier</a></li>
+        <li><a href="/auth/logout">Déconnexion</a></li>
       <% } else { %>
-        <li><a href="/auth/login-page">Login</a></li>
-        <li><a href="/auth/register-page">Register</a></li>
+        <li><a href="/auth/login-page">Connexion</a></li>
+        <li><a href="/auth/register-page">Inscription</a></li>
       <% } %>
     </ul>
   </nav>
@@ -168,30 +170,30 @@
 
   <main>
     <div class="order-container">
-      <a href="/user/account" class="back-btn">← Back to Account</a>
+      <a href="/user/account" class="back-btn">← Retourner au compte</a>
       
       <div class="order-header">
-        <h1>Order #<%= order.id %></h1>
+        <h1>Commande n°<%= order.id %></h1>
         <span class="status-badge"><%= order.status %></span>
       </div>
 
       <div class="info-grid">
         <div class="info-box">
-          <h3>Order Date</h3>
+          <h3>Date de la commande</h3>
           <div class="info-item">
-            <div class="info-value"><%= new Date(order.created_at).toLocaleString() %></div>
+            <div class="info-value"><%= new Date(order.created_at).toLocaleString('fr-FR') %></div>
           </div>
         </div>
         <div class="info-box">
-          <h3>Total Amount</h3>
+          <h3>Montant total</h3>
           <div class="info-item">
             <div class="info-value" style="font-size: 1.5rem; color: #28a745;">
-              $<%= parseFloat(order.total_amount).toFixed(2) %>
+              Ar<%= parseFloat(order.total_amount).toFixed(2) %>
             </div>
           </div>
         </div>
         <div class="info-box">
-          <h3>Shipping Address</h3>
+          <h3>Adresse de livraison</h3>
           <div class="info-item">
             <div class="info-value">
               <%= order.address %><br>
@@ -202,15 +204,15 @@
       </div>
 
       <div class="items-box">
-        <h2>Order Items</h2>
+        <h2>Articles de la commande</h2>
         <% if (items.length > 0) { %>
           <table class="items-table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Subtotal</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Sous-total</th>
               </tr>
             </thead>
             <tbody>
@@ -218,33 +220,33 @@
                 <tr>
                   <td><strong><%= item.name %></strong></td>
                   <td><%= item.quantity %></td>
-                  <td>$<%= parseFloat(item.price).toFixed(2) %></td>
-                  <td>$<%= (parseFloat(item.price) * item.quantity).toFixed(2) %></td>
+                  <td>Ar<%= parseFloat(item.price).toFixed(2) %></td>
+                  <td>Ar<%= (parseFloat(item.price) * item.quantity).toFixed(2) %></td>
                 </tr>
               <% }); %>
             </tbody>
           </table>
         <% } else { %>
-          <p>No items in this order.</p>
+          <p>Aucun article dans cette commande.</p>
         <% } %>
       </div>
 
       <div class="summary-box">
-        <h2>Order Summary</h2>
+        <h2>Résumé de la commande</h2>
         <div class="summary-row">
-          <span>Subtotal:</span>
-          <span>$<%= items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0).toFixed(2) %></span>
+          <span>Sous-total :</span>
+          <span>Ar<%= items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0).toFixed(2) %></span>
         </div>
         <div class="summary-row summary-total">
-          <span>Total:</span>
-          <span>$<%= parseFloat(order.total_amount).toFixed(2) %></span>
+          <span>Total :</span>
+          <span>Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
         </div>
       </div>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2026 Shop. All rights reserved.</p>
+    <p>&copy; 2026 Shop. Tous droits réservés.</p>
   </footer>
 </body>
 </html>

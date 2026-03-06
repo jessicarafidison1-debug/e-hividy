@@ -36,42 +36,60 @@ router.get('/', isAuthenticated, async (req, res) => {
         return res.render('checkout', {
           cartItems: [],
           total: 0,
+          shippingFee: 4000,
           user: req.session.user,
-          message: `Sorry, ${item.name} is out of stock`
+          message: `Désolé, ${item.name} est en rupture de stock`
         });
       }
     }
 
-    // Calculate total
+    // Calculate total (without shipping)
     let total = 0;
     cartItems.forEach(item => {
       total += item.price * item.quantity;
     });
+
+    // Check if user is eligible for first-order discount (10%)
+    const [userRows] = await connection.query(
+      'SELECT first_order_discount_used FROM users WHERE id = ?',
+      [userId]
+    );
+    const isFirstOrder = userRows.length > 0 && !userRows[0].first_order_discount_used;
+    const discountPercent = isFirstOrder ? 10 : 0;
+    const discountAmount = isFirstOrder ? total * 0.10 : 0;
+
+    // Free shipping for orders >= 200000 Ar (after discount)
+    const discountedTotal = total - discountAmount;
+    const shippingFee = discountedTotal >= 200000 ? 0 : 4000;
 
     connection.release();
 
     res.render('checkout', {
       cartItems,
       total,
+      discountPercent,
+      discountAmount,
+      shippingFee,
       user: req.session.user,
-      message: ''
+      message: '',
+      isFirstOrder
     });
   } catch (error) {
     console.error('Error loading checkout:', error);
-    res.status(500).send('Error loading checkout page');
+    res.status(500).send('Erreur lors du chargement de la page de paiement');
   }
 });
 
 // Place order
 router.post('/place-order', isAuthenticated, async (req, res) => {
   const connection = await db.getConnection();
-  
+
   try {
     const userId = req.session.user.id;
-    const { address, city, state, zip } = req.body;
+    const { address, city, state, zip, phone } = req.body;
 
     // Validation
-    if (!address || !city || !state || !zip) {
+    if (!address || !city || !state || !zip || !phone) {
       const [cartItems] = await connection.query(`
         SELECT c.product_id, c.quantity, p.name, p.price
         FROM cart c
@@ -84,13 +102,30 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         total += item.price * item.quantity;
       });
 
+      // Check if user is eligible for first-order discount (10%)
+      const [userRows] = await connection.query(
+        'SELECT first_order_discount_used FROM users WHERE id = ?',
+        [userId]
+      );
+      const isFirstOrder = userRows.length > 0 && !userRows[0].first_order_discount_used;
+      const discountPercent = isFirstOrder ? 10 : 0;
+      const discountAmount = isFirstOrder ? total * 0.10 : 0;
+
       connection.release();
+
+      // Free shipping for orders >= 200000 Ar (after discount)
+      const discountedTotal = total - discountAmount;
+      const shippingFee = discountedTotal >= 200000 ? 0 : 4000;
 
       return res.render('checkout', {
         cartItems,
         total,
+        discountPercent,
+        discountAmount,
+        shippingFee,
         user: req.session.user,
-        message: 'Please fill all fields'
+        message: 'Veuillez remplir tous les champs',
+        isFirstOrder
       });
     }
 
@@ -122,7 +157,7 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
             cartItems: [],
             total: 0,
             user: req.session.user,
-            message: `Sorry, some items are out of stock`
+            message: `Désolé, certains articles sont en rupture de stock`
           });
         }
       }
@@ -133,10 +168,26 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         totalAmount += item.price * item.quantity;
       });
 
+      // Check if user is eligible for first-order discount (10%)
+      const [userRows] = await connection.query(
+        'SELECT first_order_discount_used FROM users WHERE id = ?',
+        [userId]
+      );
+      const isFirstOrder = userRows.length > 0 && !userRows[0].first_order_discount_used;
+      const discountPercent = isFirstOrder ? 10 : 0;
+      const discountAmount = isFirstOrder ? totalAmount * 0.10 : 0;
+
+      // Apply discount
+      totalAmount -= discountAmount;
+
+      // Free shipping for orders >= 200000 Ar (after discount)
+      const shippingFee = totalAmount >= 200000 ? 0 : 4000;
+      totalAmount += shippingFee;
+
       // Create order
       const [orderResult] = await connection.query(
-        'INSERT INTO orders (user_id, total_amount, status, address, city, state, zip) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [userId, totalAmount, 'completed', address, city, state, zip]
+        'INSERT INTO orders (user_id, total_amount, status, address, city, state, zip, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [userId, totalAmount, 'completed', address, city, state, zip, phone]
       );
 
       const orderId = orderResult.insertId;
@@ -155,6 +206,14 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         );
       }
 
+      // Mark first-order discount as used if applicable
+      if (isFirstOrder) {
+        await connection.query(
+          'UPDATE users SET first_order_discount_used = TRUE WHERE id = ?',
+          [userId]
+        );
+      }
+
       // Clear cart
       await connection.query('DELETE FROM cart WHERE user_id = ?', [userId]);
 
@@ -162,11 +221,12 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
       await connection.commit();
       connection.release();
 
+      const discountMessage = isFirstOrder ? ' Réduction de 10% appliquée sur votre première commande !' : '';
       res.render('checkout', {
         cartItems: [],
         total: 0,
         user: req.session.user,
-        message: `Order placed successfully! Order ID: ${orderId}`
+        message: `Commande passée avec succès ! Numéro de commande : ${orderId}.${discountMessage}`
       });
     } catch (transactionError) {
       // Rollback on error
@@ -181,8 +241,9 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         connection.release();
       } catch (e) {}
     }
-    res.status(500).send('Error placing order');
+    res.status(500).send('Erreur lors de la passage de la commande');
   }
 });
 
 module.exports = router;
+

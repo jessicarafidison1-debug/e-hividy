@@ -2,18 +2,18 @@
   <div class="modal-overlay" id="logoutModal">
     <div class="modal">
       <div class="modal-header">
-        <h3><i data-lucide="log-out"></i> Logout</h3>
+        <h3><i data-lucide="log-out"></i> Se déconnecter</h3>
         <button class="modal-close" onclick="closeLogoutModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to logout from the admin panel? You will need to login again to access admin features.</p>
+        <p>Êtes-vous sûr de vouloir vous déconnecter du panneau d'administration ? Vous devrez vous reconnecter pour accéder aux fonctionnalités d'administration.</p>
       </div>
       <div class="modal-footer">
         <button class="admin-btn admin-btn-secondary" onclick="closeLogoutModal()">
-          <i data-lucide="x"></i> Cancel
+          <i data-lucide="x"></i> Annuler
         </button>
         <a href="/admin/logout" class="admin-btn admin-btn-danger">
-          <i data-lucide="log-out"></i> Logout
+          <i data-lucide="log-out"></i> Se déconnecter
         </a>
       </div>
     </div>
@@ -109,7 +109,7 @@
           // Store original content
           submitBtn.dataset.original = submitBtn.innerHTML;
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Loading...';
+          submitBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Chargement...';
           lucide.createIcons();
         }
       });

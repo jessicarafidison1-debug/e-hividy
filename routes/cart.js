@@ -36,7 +36,7 @@ router.get('/', isAuthenticated, async (req, res) => {
     res.render('cart', { cartItems, total, user: req.session.user });
   } catch (error) {
     console.error('Error fetching cart:', error);
-    res.status(500).send('Error fetching cart');
+    res.status(500).send('Erreur lors du chargement du panier');
   }
 });
 
@@ -47,7 +47,7 @@ router.post('/add', isAuthenticated, async (req, res) => {
     const { productId, quantity } = req.body;
 
     if (!productId || !quantity || quantity < 1) {
-      return res.status(400).json({ error: 'Invalid product or quantity' });
+      return res.status(400).json({ error: 'Produit ou quantité invalide' });
     }
 
     const connection = await db.getConnection();
@@ -57,7 +57,7 @@ router.post('/add', isAuthenticated, async (req, res) => {
 
     if (products.length === 0) {
       connection.release();
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'Produit non trouvé' });
     }
 
     const product = products[0];
@@ -74,7 +74,7 @@ router.post('/add', isAuthenticated, async (req, res) => {
     if (totalQtyNeeded > product.stock) {
       connection.release();
       return res.status(400).json({ 
-        error: `Only ${product.stock - currentQtyInCart} item(s) available in stock` 
+        error: `Seulement ${product.stock - currentQtyInCart} article(s) disponible(s) en stock` 
       });
     }
 
@@ -93,10 +93,10 @@ router.post('/add', isAuthenticated, async (req, res) => {
     }
 
     connection.release();
-    res.json({ success: true, message: 'Product added to cart' });
+    res.json({ success: true, message: 'Produit ajouté au panier' });
   } catch (error) {
     console.error('Error adding to cart:', error);
-    res.status(500).json({ error: 'Error adding to cart' });
+    res.status(500).json({ error: 'Erreur lors de l\'ajout au panier' });
   }
 });
 
@@ -116,18 +116,19 @@ router.post('/remove/:id', isAuthenticated, async (req, res) => {
 
     if (items.length === 0) {
       connection.release();
-      return res.status(404).json({ error: 'Item not found' });
+      return res.status(404).json({ error: 'Article non trouvé' });
     }
 
     // Delete item
     await connection.query('DELETE FROM cart WHERE id = ?', [cartId]);
     connection.release();
 
-    res.json({ success: true, message: 'Item removed from cart' });
+    res.json({ success: true, message: 'Article supprimé du panier' });
   } catch (error) {
     console.error('Error removing from cart:', error);
-    res.status(500).json({ error: 'Error removing from cart' });
+    res.status(500).json({ error: 'Erreur lors de la suppression du panier' });
   }
 });
 
 module.exports = router;
+

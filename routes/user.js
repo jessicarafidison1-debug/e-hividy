@@ -57,7 +57,7 @@ router.get('/account', isAuthenticated, async (req, res) => {
       orders: [],
       wishlistCount: 0,
       wishlistItems: [],
-      error: 'Error loading account info'
+      error: 'Erreur lors du chargement des informations du compte'
     });
   }
 });
@@ -77,7 +77,7 @@ router.get('/order/:id', isAuthenticated, async (req, res) => {
 
     if (orders.length === 0) {
       connection.release();
-      return res.status(404).send('Order not found');
+      return res.status(404).send('Commande non trouvée');
     }
 
     // Get order items
@@ -97,7 +97,7 @@ router.get('/order/:id', isAuthenticated, async (req, res) => {
     });
   } catch (error) {
     console.error('Order details error:', error);
-    res.status(500).send('Error loading order');
+    res.status(500).send('Erreur lors du chargement de la commande');
   }
 });
 
@@ -113,7 +113,7 @@ router.post('/wishlist/add', isAuthenticated, async (req, res) => {
     const { productId } = req.body;
 
     if (!productId) {
-      return res.status(400).json({ error: 'Product ID required' });
+      return res.status(400).json({ error: 'ID produit requis' });
     }
 
     const connection = await db.getConnection();
@@ -126,7 +126,7 @@ router.post('/wishlist/add', isAuthenticated, async (req, res) => {
 
     if (existing.length > 0) {
       connection.release();
-      return res.status(400).json({ error: 'Already in wishlist' });
+      return res.status(400).json({ error: 'Déjà dans la liste de souhaits' });
     }
 
     // Add to wishlist
@@ -136,10 +136,10 @@ router.post('/wishlist/add', isAuthenticated, async (req, res) => {
     );
 
     connection.release();
-    res.json({ success: true, message: 'Added to wishlist' });
+    res.json({ success: true, message: 'Ajouté à la liste de souhaits' });
   } catch (error) {
     console.error('Add to wishlist error:', error);
-    res.status(500).json({ error: 'Error adding to wishlist' });
+    res.status(500).json({ error: 'Erreur lors de l\'ajout à la liste de souhaits' });
   }
 });
 
@@ -159,18 +159,19 @@ router.post('/wishlist/remove/:id', isAuthenticated, async (req, res) => {
 
     if (items.length === 0) {
       connection.release();
-      return res.status(404).json({ error: 'Item not found' });
+      return res.status(404).json({ error: 'Article non trouvé' });
     }
 
     // Remove from wishlist
     await connection.query('DELETE FROM wishlist WHERE id = ?', [wishId]);
     connection.release();
 
-    res.json({ success: true, message: 'Removed from wishlist' });
+    res.json({ success: true, message: 'Supprimé de la liste de souhaits' });
   } catch (error) {
     console.error('Remove from wishlist error:', error);
-    res.status(500).json({ error: 'Error removing from wishlist' });
+    res.status(500).json({ error: 'Erreur lors de la suppression de la liste de souhaits' });
   }
 });
 
 module.exports = router;
+

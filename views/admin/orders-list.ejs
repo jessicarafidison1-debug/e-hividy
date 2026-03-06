@@ -1,83 +1,65 @@
-<%- include('partials/head', { title: 'Orders' }) %>
+<%- include('partials/head', { title: 'Commandes' }) %>
 <%- include('partials/sidebar', { activePage: 'orders' }) %>
 
 <main class="admin-main">
   <div class="page-header">
     <div>
-      <h1><i data-lucide="clipboard-list"></i> Orders</h1>
-      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Track and manage customer orders</p>
+      <h1>Commandes</h1>
+      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Suivre et gérer les commandes des clients</p>
     </div>
     <div class="page-header-actions">
       <button class="admin-btn admin-btn-secondary" onclick="window.print()">
-        <i data-lucide="printer"></i> Print
+        Imprimer
       </button>
     </div>
   </div>
 
-  <!-- Orders Card -->
+  <!-- Carte des commandes -->
   <div class="card">
     <div class="card-body" style="padding: 0;">
       <% if (typeof error !== 'undefined' && error) { %>
         <div class="alert alert-error" style="margin: 1.5rem;">
-          <i data-lucide="alert-circle"></i> <%= error %>
+          <%= error %>
         </div>
       <% } %>
 
       <% if (orders && orders.length > 0) { %>
-        <!-- Orders Summary -->
+        <!-- Résumé des commandes -->
         <div class="orders-summary">
           <div class="summary-item">
-            <div class="summary-icon" style="background: var(--primary-light); color: var(--primary);">
-              <i data-lucide="shopping-bag"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Total Orders</span>
+              <span class="summary-label">Commandes totales</span>
               <span class="summary-value"><%= orders.length %></span>
             </div>
           </div>
           <div class="summary-item">
-            <div class="summary-icon" style="background: var(--success-light); color: var(--success);">
-              <i data-lucide="check-circle"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Completed</span>
+              <span class="summary-label">Completées</span>
               <span class="summary-value"><%= orders.filter(o => o.status === 'completed').length %></span>
             </div>
           </div>
           <div class="summary-item">
-            <div class="summary-icon" style="background: var(--warning-light); color: var(--warning);">
-              <i data-lucide="clock"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Pending</span>
+              <span class="summary-label">En attente</span>
               <span class="summary-value"><%= orders.filter(o => o.status === 'pending').length %></span>
             </div>
           </div>
           <div class="summary-item">
-            <div class="summary-icon" style="background: var(--info-light); color: var(--info);">
-              <i data-lucide="truck"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Processing</span>
+              <span class="summary-label">En traitement</span>
               <span class="summary-value"><%= orders.filter(o => ['processing', 'shipped'].includes(o.status)).length %></span>
             </div>
           </div>
           <div class="summary-item">
-            <div class="summary-icon" style="background: var(--danger-light); color: var(--danger);">
-              <i data-lucide="x-circle"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Cancelled</span>
+              <span class="summary-label">Annulées</span>
               <span class="summary-value"><%= orders.filter(o => ['cancelled', 'failed'].includes(o.status)).length %></span>
             </div>
           </div>
           <div class="summary-item highlight">
-            <div class="summary-icon" style="background: linear-gradient(135deg, var(--success-light), var(--primary-light)); color: var(--success);">
-              <i data-lucide="dollar-sign"></i>
-            </div>
             <div class="summary-content">
-              <span class="summary-label">Total Revenue</span>
-              <span class="summary-value text-success">$<%= orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0).toFixed(2) %></span>
+              <span class="summary-label">Revenu total</span>
+              <span class="summary-value text-success">Ar<%= orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0).toFixed(2) %></span>
             </div>
           </div>
         </div>
@@ -86,11 +68,11 @@
           <table class="table">
             <thead>
               <tr>
-                <th style="width: 90px;">Order ID</th>
-                <th>Customer</th>
-                <th style="width: 130px;">Amount</th>
-                <th style="width: 130px;">Status</th>
-                <th style="width: 150px;">Date & Time</th>
+                <th style="width: 90px;">ID de commande</th>
+                <th>Client</th>
+                <th style="width: 130px;">Montant</th>
+                <th style="width: 130px;">Statu</th>
+                <th style="width: 150px;">Date et heure</th>
                 <th style="width: 80px; text-align: right;">Action</th>
               </tr>
             </thead>
@@ -103,32 +85,33 @@
                   <td>
                     <div class="customer-info">
                       <div class="customer-name">
-                        <i data-lucide="user" style="width: 14px; height: 14px; margin-right: 6px; color: var(--gray-400);"></i>
                         <span class="font-semibold"><%= order.customer_name %></span>
                       </div>
                       <div class="customer-email">
-                        <i data-lucide="mail" style="width: 12px; height: 12px; margin-right: 4px; color: var(--gray-400);"></i>
                         <%= order.email %>
+                      </div>
+                      <div class="customer-phone">
+                        <i data-lucide="phone" style="width: 12px; height: 12px;"></i>
+                        <%= order.phone || 'N/A' %>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span class="order-amount">$<%= parseFloat(order.total_amount).toFixed(2) %></span>
+                    <span class="order-amount">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
                   </td>
                   <td>
                     <%
                       const statusMap = {
-                        'completed': { icon: 'check-circle', class: 'status-completed', label: 'Completed' },
-                        'pending': { icon: 'clock', class: 'status-pending', label: 'Pending' },
-                        'processing': { icon: 'package', class: 'status-processing', label: 'Processing' },
-                        'shipped': { icon: 'truck', class: 'status-shipped', label: 'Shipped' },
-                        'cancelled': { icon: 'x-circle', class: 'status-cancelled', label: 'Cancelled' },
-                        'failed': { icon: 'alert-circle', class: 'status-failed', label: 'Failed' }
+                        'completed': { class: 'status-completed', label: 'Completée' },
+                        'pending': { class: 'status-pending', label: 'En attente' },
+                        'processing': { class: 'status-processing', label: 'En traitement' },
+                        'shipped': { class: 'status-shipped', label: 'Expédiée' },
+                        'cancelled': { class: 'status-cancelled', label: 'Annulée' },
+                        'failed': { class: 'status-failed', label: 'Échouée' }
                       };
-                      const statusInfo = statusMap[order.status] || { icon: 'file-text', class: '', label: order.status };
+                      const statusInfo = statusMap[order.status] || { class: '', label: order.status };
                     %>
                     <span class="status-badge <%= statusInfo.class %>">
-                      <i data-lucide="<%= statusInfo.icon %>"></i>
                       <%= statusInfo.label %>
                     </span>
                   </td>
@@ -140,8 +123,8 @@
                   </td>
                   <td>
                     <div class="action-buttons" style="justify-content: flex-end;">
-                      <a href="/admin/orders/<%= order.id %>" class="btn-action btn-action-view" title="View Details">
-                        <i data-lucide="eye"></i>
+                      <a href="/admin/orders/<%= order.id %>" class="btn-action btn-action-view" title="Voir les détails">
+                        Voir
                       </a>
                     </div>
                   </td>
@@ -152,13 +135,10 @@
         </div>
       <% } else { %>
         <div class="empty-state">
-          <div class="empty-state-icon-wrapper">
-            <i data-lucide="inbox" class="empty-state-icon"></i>
-          </div>
-          <h3>No Orders Yet</h3>
-          <p>Orders will appear here once customers start making purchases</p>
+          <h3>Aucune commande pour le moment</h3>
+          <p>Les commandes apparaîtront ici une fois que les clients commenceront à faire des achats</p>
           <a href="/admin/dashboard" class="admin-btn">
-            <i data-lucide="layout-dashboard"></i> View Dashboard
+            Voir le tableau de bord
           </a>
         </div>
       <% } %>
@@ -179,7 +159,6 @@
   .summary-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
     padding: 1rem;
     background: var(--white);
     border-radius: var(--radius-xl);
@@ -196,21 +175,6 @@
   .summary-item.highlight {
     border-color: var(--success);
     background: linear-gradient(135deg, var(--white), var(--success-light));
-  }
-
-  .summary-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .summary-icon i {
-    width: 24px;
-    height: 24px;
   }
 
   .summary-content {
@@ -260,6 +224,22 @@
     align-items: center;
   }
 
+  .customer-phone {
+    font-size: 0.8125rem;
+    color: var(--primary);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+
+  .customer-phone i {
+    width: 12px;
+    height: 12px;
+    color: var(--primary);
+  }
+
   .order-amount {
     font-weight: 700;
     color: var(--gray-900);
@@ -287,23 +267,6 @@
     color: var(--gray-500);
   }
 
-  .empty-state-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1.5rem;
-    background: var(--primary-light);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .empty-state-icon-wrapper .empty-state-icon {
-    width: 40px;
-    height: 40px;
-    color: var(--primary);
-  }
-
   @media (max-width: 1024px) {
     .orders-summary {
       grid-template-columns: repeat(3, 1fr);
@@ -317,16 +280,6 @@
 
     .summary-item {
       padding: 0.75rem;
-    }
-
-    .summary-icon {
-      width: 40px;
-      height: 40px;
-    }
-
-    .summary-icon i {
-      width: 20px;
-      height: 20px;
     }
 
     .summary-value {

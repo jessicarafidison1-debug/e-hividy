@@ -35,6 +35,9 @@ app.use((req, res, next) => {
     res.locals.user = null;
   }
   res.locals.search = req.query.search || '';
+  // Default language for templates
+  res.locals.lang = 'fr';
+  app.locals.locale = 'fr-FR';
   next();
 });
 
@@ -52,7 +55,7 @@ app.locals.formatDate = (dateString) => {
   if (diffHours < 24) return diffHours + 'h ago';
   if (diffDays < 7) return diffDays + 'd ago';
   
-  return date.toLocaleDateString('en-US', { 
+  return date.toLocaleDateString('fr-FR', { 
     month: 'short', 
     day: 'numeric',
     year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
@@ -60,14 +63,14 @@ app.locals.formatDate = (dateString) => {
 };
 
 app.locals.formatTime = (dateString) => {
-  return new Date(dateString).toLocaleTimeString('en-US', { 
+  return new Date(dateString).toLocaleTimeString('fr-FR', { 
     hour: '2-digit', 
     minute: '2-digit'
   });
 };
 
 app.locals.formatDateTime = (dateString) => {
-  return new Date(dateString).toLocaleDateString('en-US', { 
+  return new Date(dateString).toLocaleDateString('fr-FR', { 
     weekday: 'long',
     year: 'numeric',
     month: 'long', 
@@ -165,3 +168,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
+

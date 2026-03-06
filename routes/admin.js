@@ -21,7 +21,7 @@ const upload = multer({
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error('Only images are allowed'));
+      cb(new Error('Seules les images sont autorisées'));
     }
   },
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
@@ -69,7 +69,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.render('admin/login', { message: 'Please provide email and password' });
+      return res.render('admin/login', { message: 'Veuillez fournir l\'email et le mot de passe' });
     }
 
     const connection = await db.getConnection();
@@ -77,13 +77,13 @@ router.post('/login', async (req, res) => {
     connection.release();
 
     if (results.length === 0) {
-      return res.render('admin/login', { message: 'Invalid credentials' });
+      return res.render('admin/login', { message: 'Identifiants invalides' });
     }
 
     const passwordMatch = await bcrypt.compare(password, results[0].password);
     
     if (!passwordMatch) {
-      return res.render('admin/login', { message: 'Invalid credentials' });
+      return res.render('admin/login', { message: 'Identifiants invalides' });
     }
 
     req.session.admin = {
@@ -95,18 +95,15 @@ router.post('/login', async (req, res) => {
     res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Admin login error:', error);
-    res.render('admin/login', { message: 'Error logging in' });
+    res.render('admin/login', { message: 'Erreur lors de la connexion' });
   }
 });
 
 // Admin logout
 router.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send('Error logging out');
-    }
-    res.redirect('/admin/login');
-  });
+  // Only destroy admin session, keep user session if exists
+  req.session.admin = null;
+  res.redirect('/admin/login');
 });
 
 // Admin dashboard
@@ -147,7 +144,7 @@ router.get('/dashboard', isAdmin, async (req, res) => {
       admin: req.session.admin,
       stats: { totalOrders: 0, totalUsers: 0, totalProducts: 0, totalRevenue: 0 },
       recentOrders: [],
-      error: 'Error loading dashboard'
+      error: 'Erreur lors du chargement du tableau de bord'
     });
   }
 });
@@ -168,7 +165,7 @@ router.get('/products', isAdmin, async (req, res) => {
     res.render('admin/products-list', {
       admin: req.session.admin,
       products: [],
-      error: 'Error loading products'
+      error: 'Erreur lors du chargement des produits'
     });
   }
 });
@@ -194,7 +191,7 @@ router.post('/products/add', isAdmin, upload.single('image'), async (req, res) =
         admin: req.session.admin,
         product: { ...req.body, image: imagePath },
         isEdit: false,
-        message: 'All fields are required'
+        message: 'Tous les champs sont obligatoires'
       });
     }
 
@@ -212,7 +209,7 @@ router.post('/products/add', isAdmin, upload.single('image'), async (req, res) =
       admin: req.session.admin,
       product: req.body,
       isEdit: false,
-      message: error.message || 'Error creating product'
+      message: error.message || 'Erreur lors de la création du produit'
     });
   }
 });
@@ -259,7 +256,7 @@ router.post('/products/edit/:id', isAdmin, upload.single('image'), async (req, r
         admin: req.session.admin,
         product: products[0],
         isEdit: true,
-        message: 'All fields are required'
+        message: 'Tous les champs sont obligatoires'
       });
     }
 
@@ -294,7 +291,7 @@ router.post('/products/delete/:id', isAdmin, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Delete product error:', error);
-    res.status(500).json({ error: 'Error deleting product' });
+    res.status(500).json({ error: 'Erreur lors de la suppression du produit' });
   }
 });
 
@@ -319,7 +316,7 @@ router.get('/orders', isAdmin, async (req, res) => {
     res.render('admin/orders-list', {
       admin: req.session.admin,
       orders: [],
-      error: 'Error loading orders'
+      error: 'Erreur lors du chargement des commandes'
     });
   }
 });
@@ -351,3 +348,4 @@ router.get('/orders/:id', isAdmin, async (req, res) => {
 });
 
 module.exports = router;
+

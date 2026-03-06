@@ -1,4 +1,4 @@
-# 🎉 E-HIVIDY PROJECT - COMPLETE & READY TO USE
+# 🎉 Myeva creation PROJECT - COMPLETE & READY TO USE
 
 ## ✅ PROJECT COMPLETION STATUS
 
@@ -28,7 +28,7 @@ A complete, production-ready e-commerce application with:
 
 ### Step 1: Install Dependencies
 ```powershell
-cd c:\xampp\htdocs\e-hividy
+cd c:\xampp\htdocs\Myeva creation
 npm install
 ```
 
@@ -346,7 +346,7 @@ Your e-commerce application is complete and ready to use.
 
 **Run this command to get started:**
 ```powershell
-cd c:\xampp\htdocs\e-hividy
+cd c:\xampp\htdocs\Myeva creation
 npm install && npm run setup && npm start
 ```
 

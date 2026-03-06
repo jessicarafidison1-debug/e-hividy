@@ -1,6 +1,6 @@
 # 🎉 Project Completion Summary
 
-## E-Hividy E-Commerce Application - COMPLETE ✅
+## Myeva creation E-Commerce Application - COMPLETE ✅
 
 ### Overview
 A fully functional e-commerce web application with user authentication, product catalog, shopping cart, and checkout system. Built with Node.js, Express.js, MySQL, and EJS templating.
@@ -168,7 +168,7 @@ A fully functional e-commerce web application with user authentication, product 
 ## 📂 Project Structure
 
 ```
-e-hividy/
+Myeva creation/
 ├── server.js                    # Main application
 ├── db-setup.js                  # Database initialization
 ├── package.json                 # Dependencies & scripts

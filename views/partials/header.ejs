@@ -1,0 +1,34 @@
+<nav>
+  <div class="nav-brand">
+    <a href="/">
+      <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
+    </a>
+  </div>
+
+  <div class="nav-search">
+    <form action="/" method="GET">
+      <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+      <button type="submit">🔍</button>
+    </form>
+  </div>
+
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <ul id="navMenu">
+    <li><a href="/">Accueil</a></li>
+    <% if (typeof user !== 'undefined' && user) { %>
+      <li><a href="/user/account">Compte</a></li>
+      <li><a href="/cart">Panier</a></li>
+      <li><a href="/auth/logout">Déconnexion</a></li>
+    <% } else { %>
+      <li><a href="/auth/login-page">Connexion</a></li>
+      <li><a href="/auth/register-page">Inscription</a></li>
+    <% } %>
+  </ul>
+</nav>
+
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('navMenu');
+    menu.classList.toggle('active');
+  }
+</script>

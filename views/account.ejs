@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Account</title>
+  <title>Mon compte</title>
   <link rel="stylesheet" href="/style.css">
   <style>
     .account-container {
@@ -196,32 +196,34 @@
 <body>
   <nav>
     <div class="nav-brand">
-      <a href="/" style="color: white; text-decoration: none;"><h1>🛍️ Shop</h1></a>
+      <a href="/">
+        <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
+      </a>
     </div>
     
     <div class="nav-search">
       <form action="/" method="GET">
-        <input type="text" name="search" placeholder="Search products..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+        <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
         <button type="submit">🔍</button>
       </form>
     </div>
 
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <button class="menu-toggle" onclick="Menu()">☰</button>
     <ul id="navMenu">
-      <li><a href="/">Home</a></li>
+      <li><a href="/">Accueil</a></li>
       <% if (user) { %>
-        <li><a href="/user/account">Account</a></li>
-        <li><a href="/cart">Cart</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
+        <li><a href="/user/account">Compte</a></li>
+        <li><a href="/cart">Panier</a></li>
+        <li><a href="/auth/logout">Déconnexion</a></li>
       <% } else { %>
-        <li><a href="/auth/login-page">Login</a></li>
-        <li><a href="/auth/register-page">Register</a></li>
+        <li><a href="/auth/login-page">Connexion</a></li>
+        <li><a href="/auth/register-page">Inscription</a></li>
       <% } %>
     </ul>
   </nav>
 
   <script>
-    function toggleMenu() {
+    function Menu() {
       const menu = document.getElementById('navMenu');
       menu.classList.toggle('active');
     }
@@ -229,23 +231,23 @@
 
   <div class="account-container">
     <div class="account-header">
-      <h1>My Account</h1>
-      <p>Welcome, <%= user.name %></p>
+      <h1>Mon Compte</h1>
+      <p>Bienvenue, <%= user.name %></p>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('profile')">Profile</button>
-      <button class="tab-btn" onclick="switchTab('orders')">Orders (<%= orders.length %>)</button>
-      <button class="tab-btn" onclick="switchTab('wishlist')">Wishlist (<%= wishlistCount %>)</button>
+      <button class="tab-btn active" onclick="switchTab('profile')">Profil</button>
+      <button class="tab-btn" onclick="switchTab('orders')">Commandes (<%= orders.length %>)</button>
+      <button class="tab-btn" onclick="switchTab('wishlist')">Liste de souhaits (<%= wishlistCount %>)</button>
     </div>
 
     <!-- Profile Tab -->
     <div id="profile" class="tab-content active">
       <div class="info-box">
-        <h2>Account Information</h2>
+        <h2>Information sur le compte</h2>
         <div class="info-grid">
           <div class="info-item">
-            <label>Name</label>
+            <label>Nom</label>
             <div class="value"><%= userDetails.name %></div>
           </div>
           <div class="info-item">
@@ -253,8 +255,8 @@
             <div class="value"><%= userDetails.email %></div>
           </div>
           <div class="info-item">
-            <label>Member Since</label>
-            <div class="value"><%= new Date(userDetails.created_at).toLocaleDateString() %></div>
+            <label>Membre depuis</label>
+            <div class="value"><%= new Date(userDetails.created_at).toLocaleDateString('fr-FR') %></div>
           </div>
         </div>
       </div>
@@ -263,15 +265,15 @@
     <!-- Orders Tab -->
     <div id="orders" class="tab-content">
       <div class="info-box">
-        <h2>Order History</h2>
+        <h2>Historique des commandes</h2>
         <% if (orders.length > 0) { %>
           <table class="orders-table">
             <thead>
               <tr>
-                <th>Order ID</th>
+                <th>N° Commande</th>
                 <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
+                <th>Totale</th>
+                <th>Statu</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -279,16 +281,16 @@
               <% orders.forEach(order => { %>
                 <tr>
                   <td><strong>#<%= order.id %></strong></td>
-                  <td><%= new Date(order.created_at).toLocaleDateString() %></td>
-                  <td>$<%= parseFloat(order.total_amount).toFixed(2) %></td>
+                  <td><%= new Date(order.created_at).toLocaleDateString('fr-FR') %></td>
+                  <td>Ar<%= parseFloat(order.total_amount).toFixed(2) %></td>
                   <td><span style="background: #d4edda; padding: 0.3rem 0.6rem; border-radius: 4px;"><%= order.status %></span></td>
-                  <td><a href="/user/order/<%= order.id %>" class="view-order-btn">View</a></td>
+                  <td><a href="/user/order/<%= order.id %>" class="view-order-btn">Voir</a></td>
                 </tr>
               <% }); %>
             </tbody>
           </table>
         <% } else { %>
-          <p class="empty-message">You haven't placed any orders yet.</p>
+          <p class="empty-message">Vous n'avez pas encore passé de commande.</p>
         <% } %>
       </div>
     </div>
@@ -296,7 +298,7 @@
     <!-- Wishlist Tab -->
     <div id="wishlist" class="tab-content">
       <div class="info-box">
-        <h2>My Wishlist</h2>
+        <h2>Ma Liste de souhaits</h2>
         <% if (typeof wishlistItems !== 'undefined' && wishlistItems.length > 0) { %>
           <div class="wishlist-grid">
             <% wishlistItems.forEach(item => { %>
@@ -309,18 +311,18 @@
                   <% } %>
                 </div>
                 <h3><%= item.name %></h3>
-                <div class="price">$<%= parseFloat(item.price).toFixed(2) %></div>
+                <div class="price">Ar<%= parseFloat(item.price).toFixed(2) %></div>
                 <div class="actions">
-                  <a href="/products/<%= item.id %>" class="view-order-btn" style="text-align: center;">View</a>
-                  <button onclick="removeFromWishlist(<%= item.wish_id %>)" class="remove-btn">Remove</button>
+                  <a href="/products/<%= item.id %>" class="view-order-btn" style="text-align: center;">Voir</a>
+                  <button onclick="removeFromWishlist(<%= item.wish_id %>)" class="remove-btn">Supprimer</button>
                 </div>
               </div>
             <% }); %>
           </div>
         <% } else { %>
-          <p class="empty-message">Your wishlist is empty.</p>
+          <p class="empty-message">Votre liste de souhaits est vide.</p>
           <div style="text-align: center;">
-            <a href="/" class="view-order-btn">Browse Products</a>
+            <a href="/" class="view-order-btn">Parcourir les produits</a>
           </div>
         <% } %>
       </div>
@@ -328,12 +330,12 @@
   </div>
 
   <footer>
-    <p>&copy; 2026 Shop. All rights reserved.</p>
+    <p>&copy; 2026 Shop. Tous droits réservés.</p>
   </footer>
 
   <script>
     function removeFromWishlist(wishId) {
-      if (confirm('Are you sure you want to remove this from your wishlist?')) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cela de votre liste de souhaits ?')) {
         fetch('/user/wishlist/remove/' + wishId, {
           method: 'POST'
         })
@@ -346,12 +348,12 @@
             // Update counts if needed or just reload
             location.reload();
           } else {
-            alert(data.error || 'Error removing from wishlist');
+            alert(data.error || 'Erreur lors de la suppression de la liste de souhaits');
           }
         })
         .catch(err => {
-          console.error('Error:', err);
-          alert('Error removing from wishlist');
+          console.error('Erreur:', err);
+          alert('Erreur lors de la suppression de la liste de souhaits');
         });
       }
     }

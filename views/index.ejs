@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Hividy - Shop Quality Products Online</title>
+  <title>Myeva creation - Boutique de produits de qualité en ligne</title>
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/180.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/196.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/512.png">
-  <link rel="shortcut icon" href="/images/AppIcons/Assets.xcassets/AppIcon.appiconset/_/64.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/images/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/images/android-chrome-512x512.png">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+  <link rel="manifest" href="/images/site.webmanifest">
   
   <link rel="stylesheet" href="/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -238,44 +239,62 @@
 
     /* Categories Section */
     .categories-section {
-      max-width: 1200px;
-      margin: 4rem auto;
-      padding: 0 1rem;
+      max-width: 1400px;
+      margin: 5rem auto;
+      padding: 0 1.5rem;
     }
 
     .section-title {
       text-align: center;
-      margin-bottom: 3rem;
+      margin-bottom: 4rem;
+      position: relative;
     }
 
     .section-title h2 {
-      font-size: 2.5rem;
+      font-size: 2.75rem;
       color: var(--dark);
       margin-bottom: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--primary-gradient);
+      border-radius: 2px;
     }
 
     .section-title p {
       color: #666;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      margin-top: 1.5rem;
     }
 
     .categories-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 1rem;
     }
 
     .category-card {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      padding: 2.5rem;
-      border-radius: 16px;
+      background: white;
+      padding: 0;
+      border-radius: 20px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.4s;
-      border: 2px solid transparent;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid #f0f0f0;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
     .category-card::before {
@@ -287,37 +306,101 @@
       height: 100%;
       background: var(--primary-gradient);
       opacity: 0;
-      transition: opacity 0.4s;
+      transition: all 0.5s;
+      z-index: 1;
     }
 
     .category-card:hover {
-      border-color: var(--primary);
-      transform: translateY(-8px);
-      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+      transform: translateY(-15px) scale(1.03);
+      box-shadow: 0 25px 50px rgba(102, 126, 234, 0.35);
+      border-color: transparent;
     }
 
     .category-card:hover::before {
-      opacity: 0.1;
+      opacity: 0.05;
+    }
+
+    .category-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .category-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .category-card:hover .category-image-wrapper img {
+      transform: scale(1.2);
+    }
+
+    .category-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 100%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      z-index: 2;
+    }
+
+    .category-card:hover .category-overlay {
+      opacity: 1;
     }
 
     .category-icon {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
       position: relative;
       z-index: 1;
-      transition: transform 0.4s;
     }
 
-    .category-card:hover .category-icon {
-      transform: scale(1.2) rotate(10deg);
+    .category-content {
+      padding: 1.75rem 1.25rem;
+      position: relative;
+      z-index: 2;
+      background: white;
+      transition: all 0.5s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .category-card:hover .category-content {
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,250,0.9) 100%);
     }
 
     .category-card h3 {
-      font-size: 1.2rem;
+      font-size: 1.35rem;
       color: var(--dark);
       margin: 0;
-      position: relative;
-      z-index: 1;
+      font-weight: 700;
+      transition: color 0.5s;
+    }
+
+    .category-card:hover h3 {
+      color: var(--primary);
+    }
+
+    .category-count {
+      display: block;
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    .category-card:hover .category-count {
+      color: var(--primary);
     }
 
     /* Products Section */
@@ -901,6 +984,32 @@
         padding: 1.5rem;
       }
 
+      .categories-section {
+        margin: 3rem auto;
+        padding: 0 1rem;
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .category-image-wrapper {
+        height: 140px;
+      }
+
+      .category-content {
+        padding: 1rem 0.75rem;
+      }
+
+      .category-card h3 {
+        font-size: 1rem;
+      }
+
+      .category-count {
+        font-size: 0.75rem;
+      }
+
       .products-header {
         flex-direction: column;
         align-items: flex-start;
@@ -936,10 +1045,6 @@
         gap: 2rem;
       }
 
-      .nav-logo {
-        height: 35px;
-        width: auto;
-      }
     }
 
     @media (max-width: 480px) {
@@ -955,21 +1060,13 @@
         font-size: 1.75rem;
       }
 
-      .nav-logo {
-        height: 30px;
+      .categories-grid {
+        grid-template-columns: 1fr;
       }
-    }
 
-    /* Navigation Logo */
-    .nav-logo {
-      height: 45px;
-      width: auto;
-      display: block;
-      transition: transform 0.3s;
-    }
-
-    .nav-logo:hover {
-      transform: scale(1.05);
+      .category-image-wrapper {
+        height: 180px;
+      }
     }
 
     .nav-brand {
@@ -982,99 +1079,123 @@
   <nav>
     <div class="nav-brand">
       <a href="/">
-        <img src="/images/logo.png" alt="E-Hividy" class="nav-logo">
+        <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
       </a>
     </div>
 
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <ul id="navMenu">
-      <li><a href="/">Home</a></li>
+      <li><a href="/">Accueil</a></li>
       <% if (typeof user !== 'undefined' && user) { %>
-        <li><a href="/user/account">Account</a></li>
-        <li><a href="/cart">Cart</a></li>
-        <li><a href="/auth/logout">Logout</a></li>
+        <li><a href="/user/account">Compte</a></li>
+        <li><a href="/cart">Panier</a></li>
+        <li><a href="/auth/logout">Déconnexion</a></li>
       <% } else { %>
-        <li><a href="/auth/login-page">Login</a></li>
-        <li><a href="/auth/register-page">Register</a></li>
+        <li><a href="/auth/login-page">Connexion</a></li>
+        <li><a href="/auth/register-page">Inscription</a></li>
       <% } %>
     </ul>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Section Héros -->
   <section class="hero-section">
     <div class="hero-content">
-      <h1>Discover Amazing Products</h1>
-      <p>Shop the latest trends at unbeatable prices</p>
+      <h1>Découvrez des produits incroyables</h1>
+      <p>Achetez les dernières tendances à des prix imbattables</p>
       <form class="hero-search" action="/" method="GET">
-        <input type="text" name="search" placeholder="What are you looking for?" value="<%= typeof search !== 'undefined' ? search : '' %>">
+        <input type="text" name="search" placeholder="Que cherchez-vous ?" value="<%= typeof search !== 'undefined' ? search : '' %>">
         <button type="submit">
-          <i class="fas fa-search"></i> Search
+          <i class="fas fa-search"></i> Rechercher
         </button>
       </form>
     </div>
   </section>
 
-  <!-- Features Section -->
+  <!-- Section Caractéristiques -->
   <section class="features-section">
     <div class="feature-card">
-      <div class="feature-icon">🚚</div>
-      <h3>Free Shipping</h3>
-      <p>On orders over $50</p>
+      <img src="/images/service.jpg" alt="Livraison gratuite" class="feature-icon">
+      <h3>Livraison gratuite</h3>
+      <p>Pour les commandes de plus de 200 000 Ar</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔒</div>
-      <h3>Secure Payment</h3>
-      <p>100% secure transactions</p>
+      <img src="/images/carte.jfif" alt="Paiement sécurisé" class="feature-icon">
+      <h3>Paiement sécurisé</h3>
+      <p>100% des transactions sécurisées</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">↩️</div>
-      <h3>Easy Returns</h3>
-      <p>30-day return policy</p>
+      <img src="/images/retour.png" alt="Retours faciles" class="feature-icon">
+      <h3>Retours faciles</h3>
+      <p>Politique de retour de 30 jours</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">💬</div>
-      <h3>24/7 Support</h3>
-      <p>Dedicated customer support</p>
+      <img src="/images/support.png" alt="Support 24h/24" class="feature-icon">
+      <h3>Support 24h/24, 7j/7</h3>
+      <p>Support client dédié</p>
     </div>
   </section>
 
-  <!-- Categories Section -->
+  <!-- Section Catégories -->
   <section class="categories-section">
     <div class="section-title">
-      <h2>Shop by Category</h2>
-      <p>Browse our wide range of categories</p>
+      <h2>Acheter par catégorie</h2>
+      <p>Parcourez notre large gamme de catégories et découvrez nos meilleurs produits</p>
     </div>
     <div class="categories-grid">
-      <div class="category-card">
-        <div class="category-icon">📱</div>
-        <h3>Electronics</h3>
+      <div class="category-card" onclick="filterByCategory('Bracelet')">
+        <div class="category-image-wrapper">
+          <img src="/images/mixte.jpg" alt="Bracelet">
+          <div class="category-overlay"></div>
+        </div>
+        <div class="category-content">
+          <h3>Bracelet</h3>
+          <span class="category-count">Collection élégante</span>
+        </div>
       </div>
-      <div class="category-card">
-        <div class="category-icon">👕</div>
-        <h3>Fashion</h3>
+      <div class="category-card" onclick="filterByCategory('Verre')">
+        <div class="category-image-wrapper">
+          <img src="/images/trust.jpeg" alt="Verre">
+          <div class="category-overlay"></div>
+        </div>
+        <div class="category-content">
+          <h3>Verre</h3>
+          <span class="category-count">Articles en verre</span>
+        </div>
       </div>
-      <div class="category-card">
-        <div class="category-icon">🏠</div>
-        <h3>Home & Living</h3>
+      <div class="category-card" onclick="filterByCategory('Décoration')">
+        <div class="category-image-wrapper">
+          <img src="/images/tree.jpg" alt="Décoration murale">
+          <div class="category-overlay"></div>
+        </div>
+        <div class="category-content">
+          <h3>Décoration murale</h3>
+          <span class="category-count">Décorez votre intérieur</span>
+        </div>
       </div>
-      <div class="category-card">
-        <div class="category-icon">💄</div>
-        <h3>Beauty</h3>
+      <div class="category-card" onclick="filterByCategory('T-shirt')">
+        <div class="category-image-wrapper">
+          <img src="/images/mieva.jpg" alt="T-shirt">
+          <div class="category-overlay"></div>
+        </div>
+        <div class="category-content">
+          <h3>T-shirt</h3>
+          <span class="category-count">Mode et confort</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Products Section -->
+  <!-- Section Produits -->
   <main class="products-section">
     <div class="products-header">
-      <h2>All Products</h2>
+      <h2>Tous les produits</h2>
       <div class="sort-filter">
         <select onchange="location.href='/?sort=' + this.value + (document.querySelector('input[name=search]') ? '&search=' + document.querySelector('input[name=search]').value : '')">
-          <option value="">Sort by</option>
-          <option value="name-asc">Name (A-Z)</option>
-          <option value="name-desc">Name (Z-A)</option>
-          <option value="price-asc">Price (Low to High)</option>
-          <option value="price-desc">Price (High to Low)</option>
+          <option value="">Trier par</option>
+          <option value="name-asc">Nom (A-Z)</option>
+          <option value="name-desc">Nom (Z-A)</option>
+          <option value="price-asc">Prix (bas au haut)</option>
+          <option value="price-desc">Prix (haut au bas)</option>
         </select>
       </div>
     </div>
@@ -1091,28 +1212,28 @@
               <% } %>
               <div class="product-badges">
                 <% if (product.stock <= 0) { %>
-                  <span class="product-badge badge-sale">Out of Stock</span>
+                  <span class="product-badge badge-sale">En rupture de stock</span>
                 <% } else if (product.stock < 10) { %>
-                  <span class="product-badge badge-new">Low Stock</span>
+                  <span class="product-badge badge-new">Stock faible</span>
                 <% } %>
               </div>
               <div class="product-actions-overlay">
-                <button class="action-btn" onclick="addToWishlist(<%= product.id %>)" title="Add to Wishlist">♡</button>
-                <button class="action-btn" onclick="quickView(<%= product.id %>)" title="Quick View">👁</button>
+                <button class="action-btn" onclick="addToWishlist(<%= product.id %>)" title="Ajouter aux favoris">♡</button>
+                <button class="action-btn" onclick="quickView(<%= product.id %>)" title="Aperçu rapide">👁</button>
               </div>
             </div>
             <div class="product-info">
-              <div class="product-category">Product</div>
+              <div class="product-category">Produit</div>
               <h3 class="product-title"><%= product.name %></h3>
               <div class="product-rating">
                 <span class="stars">★★★★☆</span>
                 <span class="rating-count">(0)</span>
               </div>
               <div class="product-price">
-                <span class="current-price">$<%= parseFloat(product.price).toFixed(2) %></span>
+                <span class="current-price">Ar<%= parseFloat(product.price).toFixed(2) %></span>
               </div>
               <div class="product-footer">
-                <a href="/products/<%= product.id %>" class="btn-view">View Details</a>
+                <a href="/products/<%= product.id %>" class="btn-view">Voir les détails</a>
                 <% if (typeof user !== 'undefined' && user) { %>
                   <button class="btn-cart" onclick="addToCart(<%= product.id %>)" <%= product.stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '' %>>🛒</button>
                 <% } else { %>
@@ -1126,36 +1247,36 @@
     <% } else { %>
       <div class="no-products">
         <div class="no-products-icon">🔍</div>
-        <h3>No products found</h3>
-        <p>Try a different search or browse all products</p>
-        <a href="/" class="btn-view" style="display: inline-block; padding: 0.75rem 2rem;">Browse All Products</a>
+        <h3>Aucun produit trouvé</h3>
+        <p>Essayez une autre recherche ou parcourez tous les produits</p>
+        <a href="/" class="btn-view" style="display: inline-block; padding: 0.75rem 2rem;">Parcourir tous les produits</a>
       </div>
     <% } %>
   </main>
 
-  <!-- Newsletter Section -->
+  <!-- Section Infolettre -->
   <section class="newsletter-section">
     <div class="newsletter-card">
       <div class="newsletter-content">
-        <h2>🎉 Get 10% Off Your First Order!</h2>
-        <p>Subscribe to our newsletter and receive exclusive offers, new arrivals, and style tips.</p>
+        <h2> Obtenez 10% de réduction sur votre première commande !</h2>
+        <p>Abonnez-vous à notre newsletter et recevez des offres exclusives, les nouveaux arrivages et des conseils de mode.</p>
         <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
-          <input type="email" placeholder="Enter your email" required>
-          <button type="submit">Subscribe</button>
+          <input type="email" placeholder="Entrez votre email" required>
+          <button type="submit">S'abonner</button>
         </form>
       </div>
     </div>
   </section>
 
-  <!-- Enhanced Footer -->
+  <!-- Pied de page amélioré -->
   <footer>
     <div class="footer-bottom">
-      <p>&copy; 2026 E-Hividy. All rights reserved. Made with ❤️ in Madagascar</p>
+      <p>&copy; 2026 Myeva creation. Tous droits réservés.</p>
     </div>
   </footer>
 
-  <!-- Scroll to Top Button -->
-  <button class="scroll-top" onclick="scrollToTop()" title="Back to top">↑</button>
+  <!-- Bouton Retour vers le haut -->
+  <button class="scroll-top" onclick="scrollToTop()" title="Retour vers le haut">↑</button>
 
   <!-- Toast Container -->
   <div id="toastContainer" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;"></div>
@@ -1191,7 +1312,7 @@
         border-left: 4px solid ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#667eea'};
       `;
 
-      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      const icon = type === 'success' ? '!' : type === 'error' ? '!' : 'ℹ️';
       toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
 
       container.appendChild(toast);
@@ -1226,14 +1347,14 @@
         .then(r => r.json())
         .then(data => {
           if (data.success) {
-            showToast('Added to wishlist!', 'success');
+            showToast('Ajouté aux favoris !', 'success');
           } else {
-            showToast(data.error || 'Error adding to wishlist', 'error');
+            showToast(data.error || 'Erreur lors de l\'ajout aux favoris', 'error');
           }
         })
-        .catch(err => showToast('Error: ' + err, 'error'));
+        .catch(err => showToast('Erreur : ' + err, 'error'));
       <% } else { %>
-        showToast('Please login to add to wishlist', 'error');
+        showToast('Veuillez vous connecter pour ajouter aux favoris', 'error');
         setTimeout(() => window.location.href = '/auth/login-page', 1000);
       <% } %>
     }
@@ -1248,14 +1369,14 @@
         .then(r => r.json())
         .then(data => {
           if (data.success) {
-            showToast('Added to cart!', 'success');
+            showToast('Ajouté au panier !', 'success');
           } else {
-            showToast(data.error || 'Error adding to cart', 'error');
+            showToast(data.error || 'Erreur lors de l\'ajout au panier', 'error');
           }
         })
-        .catch(err => showToast('Error: ' + err, 'error'));
+        .catch(err => showToast('Erreur : ' + err, 'error'));
       <% } else { %>
-        showToast('Please login to add to cart', 'error');
+        showToast('Veuillez vous connecter pour ajouter au panier', 'error');
         setTimeout(() => window.location.href = '/auth/login-page', 1000);
       <% } %>
     }
@@ -1283,8 +1404,17 @@
     function subscribeNewsletter(event) {
       event.preventDefault();
       const email = event.target.querySelector('input').value;
-      showToast('Thank you for subscribing! Check your email for 10% off.', 'success');
+      showToast('Merci de votre abonnement ! Vérifiez votre email pour obtenir 10% de réduction.', 'success');
       event.target.reset();
+    }
+
+    // Filter by category
+    function filterByCategory(categoryName) {
+      showToast('Filtrage par : ' + categoryName, 'info');
+      // Scroll to products section
+      document.querySelector('.products-section').scrollIntoView({ behavior: 'smooth' });
+      // You can implement actual filtering logic here based on your needs
+      // For now, it scrolls to the products section
     }
 
     // Add smooth reveal on scroll animation
@@ -1310,6 +1440,12 @@
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
+      });
+      
+      // Add stagger animation for categories
+      const categoryCards = document.querySelectorAll('.category-card');
+      categoryCards.forEach((card, index) => {
+        card.style.transitionDelay = (index * 0.1) + 's';
       });
     });
   </script>

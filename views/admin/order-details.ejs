@@ -9,12 +9,12 @@
       </h1>
       <%
         const statusMap = {
-          'completed': { icon: 'check-circle', class: 'status-completed', label: 'Completed' },
-          'pending': { icon: 'clock', class: 'status-pending', label: 'Pending' },
-          'processing': { icon: 'package', class: 'status-processing', label: 'Processing' },
-          'shipped': { icon: 'truck', class: 'status-shipped', label: 'Shipped' },
-          'cancelled': { icon: 'x-circle', class: 'status-cancelled', label: 'Cancelled' },
-          'failed': { icon: 'alert-circle', class: 'status-failed', label: 'Failed' }
+          'completed': { icon: 'check-circle', class: 'status-completed', label: 'Complétée' },
+          'pending': { icon: 'clock', class: 'status-pending', label: 'En attente' },
+          'processing': { icon: 'package', class: 'status-processing', label: 'En traitement' },
+          'shipped': { icon: 'truck', class: 'status-shipped', label: 'Expédiée' },
+          'cancelled': { icon: 'x-circle', class: 'status-cancelled', label: 'Annulée' },
+          'failed': { icon: 'alert-circle', class: 'status-failed', label: 'Échouée' }
         };
         const statusInfo = statusMap[order.status] || { icon: 'file-text', class: '', label: order.status };
       %>
@@ -25,10 +25,10 @@
     </div>
     <div class="page-header-actions">
       <button class="admin-btn admin-btn-secondary" onclick="window.print()">
-        <i data-lucide="printer"></i> Print
+        <i data-lucide="printer"></i> Imprimer
       </button>
       <a href="/admin/orders" class="admin-btn admin-btn-secondary">
-        <i data-lucide="arrow-left"></i> Back
+        <i data-lucide="arrow-left"></i> Retour
       </a>
     </div>
   </div>
@@ -38,13 +38,13 @@
     <!-- Customer Information -->
     <div class="info-card">
       <div class="info-card-header">
-        <h3><i data-lucide="user"></i> Customer Information</h3>
+        <h3><i data-lucide="user"></i> Informations sur le client</h3>
       </div>
       <div class="info-list">
         <div class="info-item">
           <span class="label">
             <i data-lucide="user" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Name
+            Nom
           </span>
           <span class="value"><%= customer.name %></span>
         </div>
@@ -57,8 +57,15 @@
         </div>
         <div class="info-item">
           <span class="label">
+            <i data-lucide="phone" style="width: 14px; height: 14px; margin-right: 6px;"></i>
+            Téléphone
+          </span>
+          <span class="value phone-value"><%= order.phone || 'N/A' %></span>
+        </div>
+        <div class="info-item">
+          <span class="label">
             <i data-lucide="map-pin" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Shipping Address
+            Adresse de livraison
           </span>
           <span class="value address-value">
             <%= order.address || customer.address || 'N/A' %><br>
@@ -73,20 +80,20 @@
     <!-- Order Summary -->
     <div class="info-card">
       <div class="info-card-header">
-        <h3><i data-lucide="info"></i> Order Details</h3>
+        <h3><i data-lucide="info"></i> Détails de la commande</h3>
       </div>
       <div class="info-list">
         <div class="info-item">
           <span class="label">
             <i data-lucide="hash" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Order ID
+            Numéro de commande
           </span>
           <span class="value order-id-large">#<%= order.id %></span>
         </div>
         <div class="info-item">
           <span class="label">
             <i data-lucide="calendar" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Placed On
+            Passée le
           </span>
           <span class="value">
             <span class="order-date-display"><%= formatDate(order.created_at) %></span>
@@ -96,19 +103,19 @@
         <div class="info-item">
           <span class="label">
             <i data-lucide="dollar-sign" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Total Amount
+            Montant total
           </span>
-          <span class="value total-amount">$<%= parseFloat(order.total_amount).toFixed(2) %></span>
+          <span class="value total-amount">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
         </div>
         <div class="info-item">
           <span class="label">
             <i data-lucide="credit-card" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Payment Status
+            Statut de paiement
           </span>
           <span class="value">
             <span class="status-badge status-success payment-badge">
               <i data-lucide="check-circle"></i>
-              PAID
+              PAYÉE
             </span>
           </span>
         </div>
@@ -119,8 +126,8 @@
   <!-- Order Items Card -->
   <div class="card mb-4">
     <div class="card-header">
-      <h2><i data-lucide="shopping-cart"></i> Order Items</h2>
-      <span class="items-count"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %></span>
+      <h2><i data-lucide="shopping-cart"></i> Articles de la commande</h2>
+      <span class="items-count"><%= items.length %> article<%= items.length !== 1 ? 's' : '' %></span>
     </div>
     <div class="card-body" style="padding: 0;">
       <% if (items && items.length > 0) { %>
@@ -128,10 +135,10 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th style="width: 130px;">Unit Price</th>
-                <th style="width: 100px; text-align: center;">Quantity</th>
-                <th style="width: 130px; text-align: right;">Subtotal</th>
+                <th>Produit</th>
+                <th style="width: 130px;">Prix unitaire</th>
+                <th style="width: 100px; text-align: center;">Quantité</th>
+                <th style="width: 130px; text-align: right;">Sous-total</th>
               </tr>
             </thead>
             <tbody>
@@ -144,13 +151,13 @@
                     </div>
                   </td>
                   <td>
-                    <span class="item-price">$<%= parseFloat(item.price).toFixed(2) %></span>
+                    <span class="item-price">Ar<%= parseFloat(item.price).toFixed(2) %></span>
                   </td>
                   <td>
                     <span class="item-quantity"><%= item.quantity %></span>
                   </td>
                   <td>
-                    <span class="item-subtotal">$<%= (parseFloat(item.price) * item.quantity).toFixed(2) %></span>
+                    <span class="item-subtotal">Ar<%= (parseFloat(item.price) * item.quantity).toFixed(2) %></span>
                   </td>
                 </tr>
               <% }); %>
@@ -161,22 +168,34 @@
         <div class="order-summary-box">
           <div class="summary-breakdown">
             <div class="summary-row">
-              <span class="label">Subtotal (<%= items.length %> <%= items.length !== 1 ? 'items' : 'item' %>)</span>
-              <span class="value">$<%= items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0).toFixed(2) %></span>
+              <span class="label">Sous-total (<%= items.length %> <%= items.length !== 1 ? 'articles' : 'article' %>)</span>
+              <span class="value">Ar<%= items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0).toFixed(2) %></span>
             </div>
+            <% const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0); %>
+            <% const shippingFee = subtotal >= 200000 ? 0 : 4000; %>
             <div class="summary-row">
-              <span class="label">Shipping</span>
-              <span class="value shipping-free">
-                <i data-lucide="gift"></i>
-                FREE
+              <span class="label">
+                Frais de livraison
+                <% if (shippingFee === 0) { %>
+                  <span style="font-size: 0.75rem; color: var(--success); font-weight: 400; margin-left: 4px;">(Offert dès 200 000 Ar)</span>
+                <% } %>
+              </span>
+              <span class="value <%= shippingFee === 0 ? 'shipping-free' : 'shipping-fee' %>">
+                <% if (shippingFee === 0) { %>
+                  <i data-lucide="gift"></i>
+                  GRATUITE
+                <% } else { %>
+                  <i data-lucide="truck"></i>
+                  Ar<%= shippingFee.toFixed(2) %>
+                <% } %>
               </span>
             </div>
             <div class="summary-row total">
               <span class="label">
                 Total
-                <span class="total-label-hint">Including all taxes</span>
+                <span class="total-label-hint">Tous les impôts inclus</span>
               </span>
-              <span class="value total-value">$<%= parseFloat(order.total_amount).toFixed(2) %></span>
+              <span class="value total-value">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
             </div>
           </div>
         </div>
@@ -187,7 +206,7 @@
   <!-- Timeline Card -->
   <div class="card">
     <div class="card-header">
-      <h2><i data-lucide="history"></i> Order Timeline</h2>
+      <h2><i data-lucide="history"></i> Chronologie de la commande</h2>
     </div>
     <div class="card-body">
       <div class="timeline-container">
@@ -196,11 +215,11 @@
             <i data-lucide="shopping-bag"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Order Placed</div>
+            <div class="timeline-title">Commande passée</div>
             <div class="timeline-date">
-              <%= formatDate(order.created_at) %> at <%= formatTime(order.created_at) %>
+              <%= formatDate(order.created_at) %> à <%= formatTime(order.created_at) %>
             </div>
-            <div class="timeline-description">Customer completed checkout</div>
+            <div class="timeline-description">Le client a terminé le paiement</div>
           </div>
         </div>
 
@@ -209,9 +228,9 @@
             <i data-lucide="credit-card"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Payment Confirmed</div>
-            <div class="timeline-date">Transaction successful</div>
-            <div class="timeline-description">Payment processed and verified</div>
+            <div class="timeline-title">Paiement confirmé</div>
+            <div class="timeline-date">Transaction réussie</div>
+            <div class="timeline-description">Le paiement a été traité et vérifié</div>
           </div>
         </div>
 
@@ -221,9 +240,9 @@
             <i data-lucide="package"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Processing</div>
-            <div class="timeline-date">Order being prepared</div>
-            <div class="timeline-description">Items picked and packed</div>
+            <div class="timeline-title">En traitement</div>
+            <div class="timeline-date">Commande en préparation</div>
+            <div class="timeline-description">Articles prélevés et emballés</div>
           </div>
         </div>
         <% } %>
@@ -234,9 +253,9 @@
             <i data-lucide="truck"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Shipped</div>
-            <div class="timeline-date">Order in transit</div>
-            <div class="timeline-description">On the way to customer</div>
+            <div class="timeline-title">Expédiée</div>
+            <div class="timeline-date">Commande en transit</div>
+            <div class="timeline-description">En route vers le client</div>
           </div>
         </div>
         <% } %>
@@ -247,9 +266,9 @@
             <i data-lucide="check-circle"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Delivered</div>
-            <div class="timeline-date">Order completed</div>
-            <div class="timeline-description">Customer received the order</div>
+            <div class="timeline-title">Livrée</div>
+            <div class="timeline-date">Commande complétée</div>
+            <div class="timeline-description">Le client a reçu la commande</div>
           </div>
         </div>
         <% } %>
@@ -366,6 +385,13 @@
     line-height: 1.5;
   }
 
+  .phone-value {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+
   .order-id-large {
     font-size: 1.125rem;
     color: var(--primary);
@@ -466,11 +492,25 @@
     font-weight: 600;
   }
 
+  .shipping-fee {
+    color: var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 700;
+  }
+
+  .shipping-fee i {
+    width: 16px;
+    height: 16px;
+  }
+
   .shipping-free {
     color: var(--success);
     display: flex;
     align-items: center;
     gap: 0.375rem;
+    font-weight: 700;
   }
 
   .shipping-free i {

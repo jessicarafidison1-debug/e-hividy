@@ -1,5 +1,5 @@
 /* ========================================
-   E-Hividy Admin - Modern UI/UX Styles
+   Myeva creation Admin - Modern UI/UX Styles
    ======================================== */
 
 :root {
@@ -781,9 +781,9 @@ a:hover { color: var(--primary-hover); }
 }
 
 .btn-action {
-  width: 36px;
-  height: 36px;
-  padding: 0;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius);
   border: 1px solid var(--gray-200);
   background: var(--white);
@@ -794,7 +794,10 @@ a:hover { color: var(--primary-hover); }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   box-shadow: var(--shadow-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .btn-action:hover {
@@ -805,6 +808,7 @@ a:hover { color: var(--primary-hover); }
 .btn-action i {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }
 
 .btn-action-view:hover {

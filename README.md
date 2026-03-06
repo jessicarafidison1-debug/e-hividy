@@ -1,4 +1,4 @@
-# Boutique E-Commerce E-Hividy
+# Boutique E-Commerce Myeva creation
 
 Une application web e-commerce complète construite avec Node.js, Express.js et MySQL.
 
@@ -24,7 +24,7 @@ Une application web e-commerce complète construite avec Node.js, Express.js et 
 
 ### 1. Cloner ou naviguer vers le répertoire du projet
 ```bash
-cd c:\xampp\htdocs\e-hividy
+cd c:\xampp\htdocs\Myeva creation
 ```
 
 ### 2. Installer les dépendances
@@ -70,12 +70,12 @@ npm run dev
 
 ### 6. Accéder à l'application
 - **Boutique :** Ouvrez votre navigateur sur `http://localhost:3000`
-- **Administration :** `http://localhost:3000/admin/login`
+- **Administration : `http://localhost:3000/admin/login`
 
 ## Structure du Projet
 
 ```
-e-hividy/
+Myeva creation/
 ├── server.js              # Fichier principal de l'application
 ├── db-setup.js            # Script d'initialisation de la base de données
 ├── config/

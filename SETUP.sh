@@ -1,8 +1,8 @@
 #!/bin/bash
-# Quick Start Guide for E-Hividy E-Commerce Shop
+# Quick Start Guide for Myeva creation E-Commerce Shop
 
 echo "================================"
-echo "E-Hividy Quick Setup Script"
+echo "Myeva creation Quick Setup Script"
 echo "================================"
 echo ""
 

@@ -44,14 +44,15 @@ router.get('/:id', async (req, res) => {
     connection.release();
 
     if (products.length === 0) {
-      return res.status(404).send('Product not found');
+      return res.status(404).send('Produit non trouvé');
     }
 
     res.render('product', { product: products[0], user: req.session.user || null });
   } catch (error) {
     console.error('Error fetching product:', error);
-    res.status(500).send('Error fetching product');
+    res.status(500).send('Erreur lors du chargement du produit');
   }
 });
 
 module.exports = router;
+

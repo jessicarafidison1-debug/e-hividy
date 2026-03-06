@@ -1,4 +1,4 @@
-<%- include('partials/head', { title: isEdit ? 'Edit Product' : 'Add Product' }) %>
+<%- include('partials/head', { title: isEdit ? 'Modifier le produit' : 'Ajouter un produit' }) %>
 <%- include('partials/sidebar', { activePage: 'products' }) %>
 
 <main class="admin-main">
@@ -6,15 +6,15 @@
     <div>
       <h1>
         <i data-lucide="<%= isEdit ? 'edit-3' : 'plus-circle' %>"></i>
-        <%= isEdit ? 'Edit Product' : 'Add New Product' %>
+        <%= isEdit ? 'Modifier le produit' : 'Ajouter un nouveau produit' %>
       </h1>
       <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">
-        <%= isEdit ? 'Update product details and inventory' : 'Fill in the details to add a new product to your catalog' %>
+        <%= isEdit ? 'Mettre à jour les détails du produit et l\'inventaire' : 'Remplissez les détails pour ajouter un nouveau produit à votre catalogue' %>
       </p>
     </div>
     <div class="page-header-actions">
       <a href="/admin/products" class="admin-btn admin-btn-secondary">
-        <i data-lucide="arrow-left"></i> Back
+        <i data-lucide="arrow-left"></i> Retour
       </a>
     </div>
   </div>
@@ -37,7 +37,7 @@
             <div class="form-group">
               <label for="name">
                 <i data-lucide="tag" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"></i>
-                Product Name <span class="required">*</span>
+                Nom du produit <span class="required">*</span>
               </label>
               <input
                 type="text"
@@ -45,11 +45,11 @@
                 name="name"
                 class="form-control"
                 value="<%= typeof product !== 'undefined' && product ? product.name : '' %>"
-                placeholder="e.g., Wireless Bluetooth Headphones"
+                placeholder="Ex. : Casque Bluetooth sans fil"
                 required
                 minlength="3"
               >
-              <span class="form-hint">Enter a descriptive name (at least 3 characters)</span>
+              <span class="form-hint">Entrez un nom descriptif (minimum 3 caractères)</span>
             </div>
 
             <!-- Description -->
@@ -62,13 +62,13 @@
                 id="description"
                 name="description"
                 class="form-control"
-                placeholder="Describe your product in detail. Include features, specifications, and benefits..."
+                placeholder="Décrivez votre produit en détail. Incluez les caractéristiques, les spécifications et les avantages..."
                 required
                 minlength="10"
                 rows="5"
               ><%= typeof product !== 'undefined' && product ? product.description : '' %></textarea>
               <div class="char-counter">
-                <span id="charCount"><%= typeof product !== 'undefined' && product ? product.description.length : 0 %></span> characters
+                <span id="charCount"><%= typeof product !== 'undefined' && product ? product.description.length : 0 %></span> caractères
               </div>
             </div>
           </div>
@@ -79,12 +79,12 @@
             <div class="form-card">
               <h3 class="form-card-title">
                 <i data-lucide="dollar-sign"></i>
-                Pricing
+                Tarification
               </h3>
               <div class="form-group">
-                <label for="price">Price ($)</label>
+                <label for="price">Prix (Ar)</label>
                 <div class="input-with-icon">
-                  <span class="input-prefix">$</span>
+                  <span class="input-prefix">Ar</span>
                   <input
                     type="number"
                     id="price"
@@ -97,11 +97,11 @@
                     required
                   >
                 </div>
-                <span class="form-hint">Set the selling price</span>
+                <span class="form-hint">Définissez le prix de vente</span>
               </div>
 
               <div class="form-group" style="margin-bottom: 0;">
-                <label for="stock">Stock Quantity</label>
+                <label for="stock">Quantité en stock</label>
                 <div class="input-with-icon">
                   <i data-lucide="package" class="input-icon-left"></i>
                   <input
@@ -115,7 +115,7 @@
                     required
                   >
                 </div>
-                <span class="form-hint">Available inventory count</span>
+                <span class="form-hint">Nombre d\'articles disponibles en inventaire</span>
               </div>
             </div>
 
@@ -123,23 +123,23 @@
             <div class="form-card">
               <h3 class="form-card-title">
                 <i data-lucide="image"></i>
-                Product Image
+                Image du produit
               </h3>
 
               <% if (isEdit && product && product.image) { %>
                 <div class="current-image-preview">
-                  <img src="<%= product.image %>" alt="Current Image" id="currentImagePreview">
-                  <p class="text-muted small mt-1">Current: <%= product.image.split('/').pop() %></p>
+                  <img src="<%= product.image %>" alt="Image actuelle" id="currentImagePreview">
+                  <p class="text-muted small mt-1">Actuelle : <%= product.image.split('/').pop() %></p>
                 </div>
               <% } %>
 
               <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('image').click()">
                 <i data-lucide="upload-cloud" class="image-upload-icon"></i>
                 <div class="image-upload-text">
-                  <strong>Click to upload</strong> or drag and drop
+                  <strong>Cliquez pour télécharger</strong> ou glissez-déposez
                 </div>
                 <div class="image-upload-hint">
-                  PNG, JPG, GIF up to 5MB
+                  PNG, JPG, GIF jusqu\'à 5 Mo
                 </div>
                 <input
                   type="file"
@@ -152,7 +152,7 @@
               </div>
 
               <div id="imagePreview" class="form-preview hidden">
-                <img id="previewImg" src="" alt="Preview">
+                <img id="previewImg" src="" alt="Aperçu">
                 <p class="text-muted small mt-1" id="imageFileName"></p>
                 <button type="button" class="btn-remove-image" onclick="removeImage(event)">
                   <i data-lucide="x"></i>
@@ -166,10 +166,10 @@
         <div class="form-buttons">
           <button type="submit" class="admin-btn admin-btn-lg" id="submitBtn">
             <i data-lucide="<%= isEdit ? 'save' : 'plus-circle' %>"></i>
-            <%= isEdit ? 'Update Product' : 'Add Product' %>
+            <%= isEdit ? 'Mettre à jour le produit' : 'Ajouter un produit' %>
           </button>
           <a href="/admin/products" class="admin-btn admin-btn-secondary admin-btn-lg">
-            Cancel
+            Annuler
           </a>
         </div>
       </form>
@@ -408,13 +408,13 @@
   function handleImageSelect(event) {
     const file = event.target.files[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        showToast('Please select an image file', 'error');
+        if (!file.type.startsWith('image/')) {
+        showToast('Veuillez sélectionner un fichier image', 'error');
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        showToast('Image size must be less than 5MB', 'error');
+        showToast('La taille de l\'image doit être inférieure à 5 Mo', 'error');
         return;
       }
 
@@ -486,7 +486,7 @@
           handleImageSelect({ target: { files: e.dataTransfer.files } });
         }
       } else {
-        showToast('Please drop an image file', 'error');
+        showToast('Veuillez déposer un fichier image', 'error');
       }
     });
   }
@@ -507,28 +507,28 @@
 
       if (!name || name.length < 3) {
         e.preventDefault();
-        showToast('Product name must be at least 3 characters', 'error');
+        showToast('Le nom du produit doit contenir au moins 3 caractères', 'error');
         document.getElementById('name').focus();
         return false;
       }
 
       if (!description || description.length < 10) {
         e.preventDefault();
-        showToast('Description must be at least 10 characters', 'error');
+        showToast('La description doit contenir au moins 10 caractères', 'error');
         document.getElementById('description').focus();
         return false;
       }
 
       if (!price || parseFloat(price) < 0) {
         e.preventDefault();
-        showToast('Please enter a valid price', 'error');
+        showToast('Veuillez entrer un prix valide', 'error');
         document.getElementById('price').focus();
         return false;
       }
 
       if (stock === '' || parseInt(stock) < 0) {
         e.preventDefault();
-        showToast('Please enter a valid stock quantity', 'error');
+        showToast('Veuillez entrer une quantité en stock valide', 'error');
         document.getElementById('stock').focus();
         return false;
       }
@@ -536,7 +536,7 @@
       const submitBtn = document.getElementById('submitBtn');
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> ' + (typeof isEdit !== 'undefined' && isEdit ? 'Updating...' : 'Adding...');
+        submitBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> ' + (typeof isEdit !== 'undefined' && isEdit ? 'Mise à jour...' : 'Ajout...');
         if (typeof lucide !== 'undefined') lucide.createIcons();
       }
     });
