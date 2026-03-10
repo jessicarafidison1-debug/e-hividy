@@ -10,7 +10,7 @@ const isAuthenticated = (req, res, next) => {
   next();
 };
 
-// Checkout page
+// Checkout page - affiche le formulaire de livraison
 router.get('/', isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -38,12 +38,15 @@ router.get('/', isAuthenticated, async (req, res) => {
           total: 0,
           shippingFee: 4000,
           user: req.session.user,
-          message: `Désolé, ${item.name} est en rupture de stock`
+          message: `Désolé, ${item.name} est indisponible`,
+          discountPercent: 0,
+          discountAmount: 0,
+          isFirstOrder: false
         });
       }
     }
 
-    // Calculate total (without shipping)
+    // Calculate total
     let total = 0;
     cartItems.forEach(item => {
       total += item.price * item.quantity;
@@ -80,15 +83,15 @@ router.get('/', isAuthenticated, async (req, res) => {
   }
 });
 
-// Place order
-router.post('/place-order', isAuthenticated, async (req, res) => {
+// Process payment - traite la commande
+router.post('/process', isAuthenticated, async (req, res) => {
   const connection = await db.getConnection();
 
   try {
     const userId = req.session.user.id;
     const { address, city, state, zip, phone } = req.body;
 
-    // Validation
+    // Validation des champs obligatoires
     if (!address || !city || !state || !zip || !phone) {
       const [cartItems] = await connection.query(`
         SELECT c.product_id, c.quantity, p.name, p.price
@@ -102,7 +105,6 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         total += item.price * item.quantity;
       });
 
-      // Check if user is eligible for first-order discount (10%)
       const [userRows] = await connection.query(
         'SELECT first_order_discount_used FROM users WHERE id = ?',
         [userId]
@@ -111,11 +113,10 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
       const discountPercent = isFirstOrder ? 10 : 0;
       const discountAmount = isFirstOrder ? total * 0.10 : 0;
 
-      connection.release();
-
-      // Free shipping for orders >= 200000 Ar (after discount)
       const discountedTotal = total - discountAmount;
       const shippingFee = discountedTotal >= 200000 ? 0 : 4000;
+
+      connection.release();
 
       return res.render('checkout', {
         cartItems,
@@ -124,7 +125,7 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
         discountAmount,
         shippingFee,
         user: req.session.user,
-        message: 'Veuillez remplir tous les champs',
+        message: '⚠️ Veuillez remplir tous les champs obligatoires',
         isFirstOrder
       });
     }
@@ -157,7 +158,11 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
             cartItems: [],
             total: 0,
             user: req.session.user,
-            message: `Désolé, certains articles sont en rupture de stock`
+            message: `⚠️ Désolé, certains articles sont indisponibles en stock`,
+            discountPercent: 0,
+            discountAmount: 0,
+            shippingFee: 4000,
+            isFirstOrder: false
           });
         }
       }
@@ -184,7 +189,7 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
       const shippingFee = totalAmount >= 200000 ? 0 : 4000;
       totalAmount += shippingFee;
 
-      // Create order
+      // Create order with status 'completed' (paid)
       const [orderResult] = await connection.query(
         'INSERT INTO orders (user_id, total_amount, status, address, city, state, zip, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [userId, totalAmount, 'completed', address, city, state, zip, phone]
@@ -221,29 +226,31 @@ router.post('/place-order', isAuthenticated, async (req, res) => {
       await connection.commit();
       connection.release();
 
-      const discountMessage = isFirstOrder ? ' Réduction de 10% appliquée sur votre première commande !' : '';
+      const discountMessage = isFirstOrder ? ' 🎉 Réduction de 10% appliquée sur votre première commande !' : '';
       res.render('checkout', {
         cartItems: [],
         total: 0,
         user: req.session.user,
-        message: `Commande passée avec succès ! Numéro de commande : ${orderId}.${discountMessage}`
+        message: `✅ Commande #${orderId} validée et payée avec succès !${discountMessage}`,
+        discountPercent: 0,
+        discountAmount: 0,
+        shippingFee: 0,
+        isFirstOrder: false
       });
     } catch (transactionError) {
-      // Rollback on error
       await connection.rollback();
       throw transactionError;
     }
   } catch (error) {
-    console.error('Error placing order:', error);
+    console.error('Error processing order:', error);
     if (connection) {
       try {
         await connection.rollback();
         connection.release();
       } catch (e) {}
     }
-    res.status(500).send('Erreur lors de la passage de la commande');
+    res.status(500).send('Erreur lors du traitement de la commande');
   }
 });
 
 module.exports = router;
-

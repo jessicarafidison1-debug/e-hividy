@@ -69,6 +69,7 @@ async function setupDatabase() {
         city VARCHAR(100) NOT NULL,
         state VARCHAR(100) NOT NULL,
         zip VARCHAR(20) NOT NULL,
+        phone VARCHAR(20),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
@@ -126,6 +127,65 @@ async function setupDatabase() {
       )
     `);
     console.log('Order status history table created/exists');
+
+    // Create notifications table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        order_id INT,
+        type VARCHAR(50) NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+      )
+    `);
+    console.log('Notifications table created/exists');
+
+    // Add first_order_discount_used column to users table
+    await connection.query(`
+      ALTER TABLE users 
+      ADD COLUMN IF NOT EXISTS first_order_discount_used BOOLEAN DEFAULT FALSE
+    `);
+    console.log('first_order_discount_used column added to users table');
+
+    // Create order_requests table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS order_requests (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        total_amount DECIMAL(10, 2) NOT NULL,
+        discount_percent DECIMAL(5, 2) DEFAULT 0,
+        discount_amount DECIMAL(10, 2) DEFAULT 0,
+        shipping_fee DECIMAL(10, 2) DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'pending',
+        address TEXT NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        state VARCHAR(100) NOT NULL,
+        zip VARCHAR(20) NOT NULL,
+        phone VARCHAR(20),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('order_requests table created/exists');
+
+    // Create order_request_items table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS order_request_items (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        request_id INT NOT NULL,
+        product_id INT NOT NULL,
+        quantity INT NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        FOREIGN KEY (request_id) REFERENCES order_requests(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('order_request_items table created/exists');
 
     // Insert sample products
     const [existingProducts] = await connection.query('SELECT COUNT(*) as count FROM products');

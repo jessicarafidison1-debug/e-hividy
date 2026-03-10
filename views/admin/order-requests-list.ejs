@@ -1,20 +1,20 @@
-<%- include('partials/head', { title: 'Commandes' }) %>
-<%- include('partials/sidebar', { activePage: 'orders' }) %>
+<%- include('partials/head', { title: 'Demandes de commande' }) %>
+<%- include('partials/sidebar', { activePage: 'order-requests' }) %>
 
 <main class="admin-main">
   <div class="page-header">
     <div>
-      <h1>Commandes</h1>
-      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Suivre et gérer les commandes des clients</p>
+      <h1>Demandes de commande</h1>
+      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Gérer les demandes de commande des clients</p>
     </div>
     <div class="page-header-actions">
       <button class="admin-btn admin-btn-secondary" onclick="window.print()">
-        <i data-lucide="printer"></i> Imprimer
+        Imprimer
       </button>
     </div>
   </div>
 
-  <!-- Carte des commandes -->
+  <!-- Carte des demandes de commande -->
   <div class="card">
     <div class="card-body" style="padding: 0;">
       <% if (typeof error !== 'undefined' && error) { %>
@@ -23,43 +23,37 @@
         </div>
       <% } %>
 
-      <% if (orders && orders.length > 0) { %>
-        <!-- Résumé des commandes -->
+      <% if (requests && requests.length > 0) { %>
+        <!-- Résumé des demandes -->
         <div class="orders-summary">
           <div class="summary-item">
             <div class="summary-content">
-              <span class="summary-label">Commandes totales</span>
-              <span class="summary-value"><%= orders.length %></span>
+              <span class="summary-label">Demandes totales</span>
+              <span class="summary-value"><%= requests.length %></span>
             </div>
           </div>
           <div class="summary-item">
             <div class="summary-content">
               <span class="summary-label">Completées</span>
-              <span class="summary-value"><%= orders.filter(o => o.status === 'completed').length %></span>
+              <span class="summary-value"><%= requests.filter(r => r.status === 'completed').length %></span>
             </div>
           </div>
           <div class="summary-item">
             <div class="summary-content">
               <span class="summary-label">En attente</span>
-              <span class="summary-value"><%= orders.filter(o => o.status === 'pending').length %></span>
+              <span class="summary-value"><%= requests.filter(r => r.status === 'pending').length %></span>
             </div>
           </div>
           <div class="summary-item">
             <div class="summary-content">
-              <span class="summary-label">En traitement</span>
-              <span class="summary-value"><%= orders.filter(o => ['processing', 'shipped'].includes(o.status)).length %></span>
+              <span class="summary-label">Approuvées</span>
+              <span class="summary-value"><%= requests.filter(r => r.status === 'approved').length %></span>
             </div>
           </div>
           <div class="summary-item">
             <div class="summary-content">
               <span class="summary-label">Annulées</span>
-              <span class="summary-value"><%= orders.filter(o => ['cancelled', 'failed'].includes(o.status)).length %></span>
-            </div>
-          </div>
-          <div class="summary-item highlight">
-            <div class="summary-content">
-              <span class="summary-label">Revenu total</span>
-              <span class="summary-value text-success">Ar<%= orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0).toFixed(2) %></span>
+              <span class="summary-value"><%= requests.filter(r => r.status === 'cancelled').length %></span>
             </div>
           </div>
         </div>
@@ -68,7 +62,7 @@
           <table class="table">
             <thead>
               <tr>
-                <th style="width: 90px;">ID de commande</th>
+                <th style="width: 90px;">ID demande</th>
                 <th>Client</th>
                 <th style="width: 130px;">Montant</th>
                 <th style="width: 130px;">Statu</th>
@@ -77,39 +71,37 @@
               </tr>
             </thead>
             <tbody>
-              <% orders.forEach(order => { %>
+              <% requests.forEach(request => { %>
                 <tr>
                   <td>
-                    <span class="order-id">#<%= order.id %></span>
+                    <span class="order-id">#<%= request.id %></span>
                   </td>
                   <td>
                     <div class="customer-info">
                       <div class="customer-name">
-                        <span class="font-semibold"><%= order.customer_name %></span>
+                        <span class="font-semibold"><%= request.customer_name %></span>
                       </div>
                       <div class="customer-email">
-                        <%= order.email %>
+                        <%= request.email %>
                       </div>
                       <div class="customer-phone">
                         <i data-lucide="phone" style="width: 12px; height: 12px;"></i>
-                        <%= order.phone || 'N/A' %>
+                        <%= request.phone || 'N/A' %>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span class="order-amount">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
+                    <span class="order-amount">Ar<%= parseFloat(request.total_amount).toFixed(2) %></span>
                   </td>
                   <td>
                     <%
                       const statusMap = {
                         'completed': { class: 'status-completed', label: 'Completée' },
                         'pending': { class: 'status-pending', label: 'En attente' },
-                        'processing': { class: 'status-processing', label: 'En traitement' },
-                        'shipped': { class: 'status-shipped', label: 'Expédiée' },
-                        'cancelled': { class: 'status-cancelled', label: 'Annulée' },
-                        'failed': { class: 'status-failed', label: 'Échouée' }
+                        'approved': { class: 'status-approved', label: 'Approuvée - En attente validation admin' },
+                        'cancelled': { class: 'status-cancelled', label: 'Annulée' }
                       };
-                      const statusInfo = statusMap[order.status] || { class: '', label: order.status };
+                      const statusInfo = statusMap[request.status] || { class: '', label: request.status };
                     %>
                     <span class="status-badge <%= statusInfo.class %>">
                       <%= statusInfo.label %>
@@ -117,20 +109,20 @@
                   </td>
                   <td>
                     <div class="datetime-cell">
-                      <span class="order-date"><%= formatDate(order.created_at) %></span>
-                      <span class="order-time"><%= formatTime(order.created_at) %></span>
+                      <span class="order-date"><%= formatDate(request.created_at) %></span>
+                      <span class="order-time"><%= formatTime(request.created_at) %></span>
                     </div>
                   </td>
                   <td>
                     <div class="action-buttons" style="justify-content: flex-end;">
-                      <a href="/admin/orders/<%= order.id %>" class="btn-action btn-action-view" title="Voir les détails">
+                      <a href="/admin/order-requests/<%= request.id %>" class="btn-action btn-action-view" title="Voir les détails">
                         Voir
                       </a>
-                      <% if (order.status === 'pending') { %>
-                        <button class="btn-action btn-approve" onclick="quickApprove(<%= order.id %>)" title="Valider rapidement">
+                      <% if (request.status === 'pending') { %>
+                        <button class="btn-action btn-approve" onclick="quickApprove(<%= request.id %>)" title="Valider rapidement">
                           <i data-lucide="check" style="width: 14px; height: 14px;"></i>
                         </button>
-                        <button class="btn-action btn-cancel" onclick="quickCancel(<%= order.id %>)" title="Annuler rapidement">
+                        <button class="btn-action btn-cancel" onclick="quickCancel(<%= request.id %>)" title="Annuler rapidement">
                           <i data-lucide="x" style="width: 14px; height: 14px;"></i>
                         </button>
                       <% } %>
@@ -143,8 +135,8 @@
         </div>
       <% } else { %>
         <div class="empty-state">
-          <h3>Aucune commande pour le moment</h3>
-          <p>Les commandes apparaîtront ici une fois que les clients commenceront à faire des achats</p>
+          <h3>Aucune demande de commande pour le moment</h3>
+          <p>Les demandes de commande apparaîtront ici une fois que les clients commenceront à en soumettre</p>
           <a href="/admin/dashboard" class="admin-btn">
             Voir le tableau de bord
           </a>
@@ -178,11 +170,6 @@
   .summary-item:hover {
     box-shadow: var(--shadow-sm);
     transform: translateY(-2px);
-  }
-
-  .summary-item.highlight {
-    border-color: var(--success);
-    background: linear-gradient(135deg, var(--white), var(--success-light));
   }
 
   .summary-content {
@@ -275,6 +262,12 @@
     color: var(--gray-500);
   }
 
+  .status-approved {
+    background-color: var(--success-light);
+    color: var(--success);
+    border: 1px solid var(--success);
+  }
+
   @media (max-width: 1024px) {
     .orders-summary {
       grid-template-columns: repeat(3, 1fr);
@@ -294,42 +287,19 @@
       font-size: 1.125rem;
     }
   }
-  
-  /* Print styles for orders summary */
-  @media print {
-    .orders-summary {
-      padding: 1rem !important;
-      margin: 0 !important;
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
-    .summary-item {
-      padding: 0.5rem !important;
-      margin: 0 !important;
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
-    .summary-item.highlight {
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
-    .table-responsive {
-      overflow: visible !important;
-    }
-  }
 </style>
 
 <%- include('partials/footer') %>
 <%- include('partials/scripts') %>
 
 <script>
-  function quickApprove(orderId) {
-    if (!confirm('Êtes-vous sûr de vouloir valider la commande #' + orderId + ' ?')) return;
+  function quickApprove(requestId) {
+    if (!confirm('Êtes-vous sûr de vouloir valider la demande #' + requestId + ' ?\nLe client pourra alors passer sa commande.')) return;
 
-    fetch('/admin/orders/' + orderId + '/approve', {
+    fetch('/admin/order-requests/' + requestId + '/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId })
+      body: JSON.stringify({ requestId })
     })
     .then(res => {
       if (!res.ok) {
@@ -339,7 +309,7 @@
     })
     .then(data => {
       if (data.success) {
-        alert('✅ Commande #' + orderId + ' validée avec succès !\nLe client a été notifié par notification.');
+        alert('✅ Demande #' + requestId + ' validée avec succès !\nLe client a été notifié par notification et peut maintenant passer sa commande.');
         window.location.reload();
       } else {
         alert('Erreur: ' + data.message);
@@ -347,17 +317,17 @@
     })
     .catch(err => {
       console.error('Approve error:', err);
-      alert('❌ Erreur lors de la validation de la commande: ' + err.message);
+      alert('❌ Erreur lors de la validation de la demande: ' + err.message);
     });
   }
 
-  function quickCancel(orderId) {
-    if (!confirm('Êtes-vous sûr de vouloir annuler la commande #' + orderId + ' ?\nLes produits seront remis en stock.')) return;
+  function quickCancel(requestId) {
+    if (!confirm('Êtes-vous sûr de vouloir annuler la demande #' + requestId + ' ?')) return;
 
-    fetch('/admin/orders/' + orderId + '/cancel', {
+    fetch('/admin/order-requests/' + requestId + '/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId })
+      body: JSON.stringify({ requestId })
     })
     .then(res => {
       if (!res.ok) {
@@ -367,7 +337,7 @@
     })
     .then(data => {
       if (data.success) {
-        alert('❌ Commande #' + orderId + ' annulée avec succès !\nLes produits ont été remis en stock.\nLe client a été notifié par notification.');
+        alert('❌ Demande #' + requestId + ' annulée avec succès !\nLe client a été notifié par notification.');
         window.location.reload();
       } else {
         alert('Erreur: ' + data.message);
@@ -375,7 +345,7 @@
     })
     .catch(err => {
       console.error('Cancel error:', err);
-      alert('❌ Erreur lors de l\'annulation de la commande: ' + err.message);
+      alert('❌ Erreur lors de l\'annulation de la demande: ' + err.message);
     });
   }
 </script>

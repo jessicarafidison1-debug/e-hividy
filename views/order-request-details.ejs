@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détails de la demande de commande</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .order-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .order-header {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .order-header h1 {
+      margin: 0;
+    }
+
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-approved {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-completed {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .info-item {
+      margin-bottom: 1rem;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      color: #333;
+      margin-top: 0.3rem;
+    }
+
+    .items-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .items-table th,
+    .items-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .items-table th {
+      background-color: #f9f9f9;
+      font-weight: bold;
+    }
+
+    .summary-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .summary-total {
+      border-bottom: none;
+      border-top: 2px solid #333;
+      padding-top: 1rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #28a745;
+    }
+
+    .back-btn {
+      background-color: #007bff;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 2rem;
+    }
+
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 1px solid;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      border-color: #ffc107;
+      color: #856404;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      border-color: #28a745;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      border-color: #0c5460;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/client-header') %>
+
+  <main>
+    <div class="order-container">
+      <a href="/user/account" class="back-btn">← Retourner au compte</a>
+
+      <div class="order-header">
+        <h1>Demande de commande n°<%= request.id %></h1>
+        <%
+          const statusMap = {
+            'pending': { class: 'status-pending', label: 'En attente de validation', icon: '⏳' },
+            'approved': { class: 'status-approved', label: 'Approuvée - Payez maintenant', icon: '✅' },
+            'completed': { class: 'status-completed', label: 'Complétée', icon: '✓' },
+            'cancelled': { class: 'status-cancelled', label: 'Annulée', icon: '❌' }
+          };
+          const statusInfo = statusMap[request.status] || { class: '', label: request.status, icon: '' };
+        %>
+        <span class="status-badge <%= statusInfo.class %>"><%= statusInfo.icon %> <%= statusInfo.label %></span>
+      </div>
+
+      <% if (request.status === 'pending') { %>
+        <div class="alert alert-warning">
+          <strong>⏳ Demande en attente :</strong> Votre demande est en cours de validation par notre équipe. Vous recevrez une notification une fois qu'elle sera approuvée.
+        </div>
+      <% } else if (request.status === 'approved') { %>
+        <div class="alert alert-success">
+          <strong>✅ Demande approuvée :</strong> Votre demande a été validée ! Vous pouvez maintenant procéder au paiement de votre commande.
+          <div style="margin-top: 1rem;">
+            <a href="/checkout/pay/<%= request.id %>" class="btn" style="background: #28a745; color: white; text-decoration: none;">Procéder au paiement</a>
+          </div>
+        </div>
+      <% } else if (request.status === 'completed') { %>
+        <div class="alert alert-info">
+          <strong>✓ Demande complétée :</strong> Cette demande a été convertie en commande.
+        </div>
+      <% } else if (request.status === 'cancelled') { %>
+        <div class="alert alert-danger">
+          <strong>❌ Demande annulée :</strong> Votre demande a été annulée par l'administrateur. Pour toute question, veuillez nous contacter.
+        </div>
+      <% } %>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <h3>Date de la demande</h3>
+          <div class="info-item">
+            <div class="info-value"><%= new Date(request.created_at).toLocaleString('fr-FR') %></div>
+          </div>
+        </div>
+        <div class="info-box">
+          <h3>Montant total estimé</h3>
+          <div class="info-item">
+            <div class="info-value" style="font-size: 1.5rem; color: #28a745;">
+              Ar<%= parseFloat(request.total_amount).toFixed(2) %>
+            </div>
+          </div>
+        </div>
+        <div class="info-box">
+          <h3>Adresse de livraison</h3>
+          <div class="info-item">
+            <div class="info-value">
+              <%= request.address %><br>
+              <%= request.city %>, <%= request.state %> <%= request.zip %>
+            </div>
+          </div>
+        </div>
+        <div class="info-box">
+          <h3>Téléphone</h3>
+          <div class="info-item">
+            <div class="info-value" style="font-weight: bold; color: #007bff;">
+              <%= request.phone || 'N/A' %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="items-box">
+        <h2>Articles de la demande</h2>
+        <% if (items.length > 0) { %>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Sous-total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% items.forEach(item => { %>
+                <tr>
+                  <td><strong><%= item.name %></strong></td>
+                  <td><%= item.quantity %></td>
+                  <td>Ar<%= parseFloat(item.price).toFixed(2) %></td>
+                  <td>Ar<%= (parseFloat(item.price) * item.quantity).toFixed(2) %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        <% } else { %>
+          <p>Aucun article dans cette demande.</p>
+        <% } %>
+      </div>
+
+      <div class="summary-box">
+        <h2>Résumé de la demande</h2>
+        <% const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0); %>
+        <div class="summary-row">
+          <span>Sous-total :</span>
+          <span>Ar<%= subtotal.toFixed(2) %></span>
+        </div>
+        <% if (request.discount_amount > 0) { %>
+        <div class="summary-row" style="color: #28a745; font-weight: 600;">
+          <span>Réduction première commande (<%= request.discount_percent %>%) :</span>
+          <span>- Ar<%= parseFloat(request.discount_amount).toFixed(2) %></span>
+        </div>
+        <% } %>
+        <div class="summary-row">
+          <span>Frais de livraison :</span>
+          <span><%= request.shipping_fee === 0 ? '<strong style="color: #28a745;">GRATUITE</strong>' : 'Ar' + parseFloat(request.shipping_fee).toFixed(2) %></span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total estimé :</span>
+          <span>Ar<%= parseFloat(request.total_amount).toFixed(2) %></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Shop. Tous droits réservés.</p>
+  </footer>
+
+  <style>
+    .timeline-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
+    }
+
+    .timeline-box h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 2rem;
+      padding-left: 1.5rem;
+      border-left: 2px solid #e0e0e0;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+      border-left-color: transparent;
+    }
+
+    .timeline-item.active {
+      border-left-color: #007bff;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.375rem;
+      top: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      z-index: 1;
+    }
+
+    .timeline-item.active .timeline-dot {
+      background: #007bff;
+      border-color: #007bff;
+    }
+
+    .timeline-content {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .timeline-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-date {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-description {
+      font-size: 0.875rem;
+      color: #555;
+      background: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  </style>
+
+  <!-- Order Request Timeline -->
+  <div class="timeline-box">
+    <h2>Chronologie de la demande</h2>
+    <div class="timeline">
+      <div class="timeline-item active">
+        <div class="timeline-dot">📝</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Demande soumise</div>
+          <div class="timeline-date"><%= new Date(request.created_at).toLocaleString('fr-FR') %></div>
+          <div class="timeline-description">Votre demande a été créée avec succès</div>
+        </div>
+      </div>
+      <% if (request.status === 'approved') { %>
+      <div class="timeline-item active">
+        <div class="timeline-dot">✅</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Demande approuvée</div>
+          <div class="timeline-date">Approuvée par l'administrateur</div>
+          <div class="timeline-description">Vous pouvez maintenant passer votre commande</div>
+        </div>
+      </div>
+      <% } %>
+      <% if (request.status === 'completed') { %>
+      <div class="timeline-item active">
+        <div class="timeline-dot">✓</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Demande complétée</div>
+          <div class="timeline-date">Commande créée automatiquement</div>
+          <div class="timeline-description">Votre commande a été générée et payée</div>
+        </div>
+      </div>
+      <% } %>
+      <% if (request.status === 'cancelled') { %>
+      <div class="timeline-item active">
+        <div class="timeline-dot">❌</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Demande annulée</div>
+          <div class="timeline-date">Annulée par l'administrateur</div>
+          <div class="timeline-description">La demande a été annulée</div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

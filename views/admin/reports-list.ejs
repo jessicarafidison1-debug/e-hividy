@@ -1,0 +1,261 @@
+<%- include('partials/head', { title: 'Rapports' }) %>
+<%- include('partials/sidebar', { activePage: 'reports' }) %>
+
+<main class="admin-main">
+  <div class="page-header">
+    <div>
+      <h1><i data-lucide="file-text"></i> Rapports PDF</h1>
+      <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Historique des rapports générés et sauvegardés</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding: 0;">
+      <% if (reports && reports.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Type de rapport</th>
+                <th>Nom du fichier</th>
+                <th style="width: 100px;">Taille</th>
+                <th style="width: 150px;">Généré par</th>
+                <th style="width: 150px;">Date de génération</th>
+                <th style="width: 150px;">Dernier téléchargement</th>
+                <th style="width: 120px; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% reports.forEach(report => { 
+                var typeLabel = report.report_type;
+                var typeIcon = '📄';
+                var typeColor = '#6b7280';
+                
+                if (report.report_type === 'dashboard') {
+                  typeLabel = 'Tableau de bord';
+                  typeIcon = '📊';
+                  typeColor = '#6366f1';
+                } else if (report.report_type === 'products') {
+                  typeLabel = 'Produits';
+                  typeIcon = '📦';
+                  typeColor = '#10b981';
+                } else if (report.report_type === 'orders') {
+                  typeLabel = 'Commandes';
+                  typeIcon = '📋';
+                  typeColor = '#f59e0b';
+                }
+              %>
+                <tr>
+                  <td><span class="font-semibold">#<%= report.id %></span></td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                      <span style="font-size: 1.25rem;"><%= typeIcon %></span>
+                      <span style="font-weight: 600; color: <%= typeColor %>;"><%= typeLabel %></span>
+                    </span>
+                  </td>
+                  <td>
+                    <span style="font-family: monospace; font-size: 0.875rem; color: var(--gray-600);">
+                      <%= report.original_name %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-muted">
+                      <%= (report.file_size / 1024).toFixed(1) %> KB
+                    </span>
+                  </td>
+                  <td>
+                    <%= report.generated_by_name || 'Système' %>
+                  </td>
+                  <td>
+                    <div style="display: flex; flex-direction: column; gap: 0.125rem;">
+                      <span style="font-size: 0.875rem; font-weight: 500;">
+                        <%= new Date(report.generated_at).toLocaleDateString('fr-FR') %>
+                      </span>
+                      <span style="font-size: 0.75rem; color: var(--gray-500);">
+                        <%= new Date(report.generated_at).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) %>
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <% if (report.downloaded_at) { %>
+                      <div style="display: flex; flex-direction: column; gap: 0.125rem;">
+                        <span style="font-size: 0.875rem; font-weight: 500;">
+                          <%= new Date(report.downloaded_at).toLocaleDateString('fr-FR') %>
+                        </span>
+                        <span style="font-size: 0.75rem; color: var(--gray-500);">
+                          <%= new Date(report.downloaded_at).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) %>
+                        </span>
+                      </div>
+                    <% } else { %>
+                      <span style="color: var(--gray-400); font-size: 0.875rem;">Jamais</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                      <a href="/admin/reports/view/<%= report.id %>" 
+                         class="btn-action btn-action-sm btn-action-info" 
+                         title="Voir"
+                         target="_blank">
+                        <i data-lucide="eye"></i>
+                      </a>
+                      <a href="/admin/reports/download/<%= report.id %>" 
+                         class="btn-action btn-action-sm btn-action-success" 
+                         title="Télécharger">
+                        <i data-lucide="download"></i>
+                      </a>
+                      <button onclick="deleteReport(<%= report.id %>, '<%= report.original_name %>')" 
+                              class="btn-action btn-action-sm btn-action-danger" 
+                              title="Supprimer">
+                        <i data-lucide="trash-2"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-state-icon-wrapper">
+            <i data-lucide="inbox" class="empty-state-icon"></i>
+          </div>
+          <h3>Aucun rapport</h3>
+          <p class="text-muted">Aucun rapport PDF n'a été généré pour le moment.</p>
+          <div style="margin-top: 1.5rem;">
+            <a href="/admin/dashboard" class="admin-btn">
+              <i data-lucide="arrow-left"></i> Retour au tableau de bord
+            </a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i data-lucide="alert-triangle"></i> Supprimer le rapport</h3>
+      <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Êtes-vous sûr de vouloir supprimer le rapport <strong id="deleteReportName"></strong> ? Cette action est irréversible.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="admin-btn admin-btn-secondary" onclick="closeDeleteModal()">
+        <i data-lucide="x"></i> Annuler
+      </button>
+      <button class="admin-btn admin-btn-danger" id="confirmDeleteBtn">
+        <i data-lucide="trash-2"></i> Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+  .empty-state-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-state-icon {
+    width: 40px;
+    height: 40px;
+    color: var(--gray-400);
+  }
+  .empty-state h3 {
+    margin-bottom: 0.5rem;
+    color: var(--gray-900);
+  }
+  .empty-state p {
+    color: var(--gray-500);
+    margin-bottom: 0;
+  }
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    color: var(--gray-600);
+  }
+  .btn-action-sm {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.8125rem;
+  }
+  .btn-action:hover {
+    background: var(--gray-100);
+    color: var(--gray-900);
+  }
+  .btn-action-info:hover {
+    background: var(--info-light);
+    color: var(--info-dark);
+  }
+  .btn-action-success:hover {
+    background: var(--success-light);
+    color: var(--success-dark);
+  }
+  .btn-action-danger:hover {
+    background: var(--danger-light);
+    color: var(--danger-dark);
+  }
+</style>
+
+<%- include('partials/footer') %>
+<%- include('partials/scripts') %>
+
+<script>
+  let deleteReportId = null;
+
+  function deleteReport(id, name) {
+    deleteReportId = id;
+    document.getElementById('deleteReportName').textContent = name;
+    document.getElementById('deleteModal').classList.add('active');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+    deleteReportId = null;
+  }
+
+  document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (deleteReportId) {
+      fetch('/admin/reports/delete/' + deleteReportId, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            showToast('Rapport supprimé avec succès', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showToast('Erreur: ' + data.message, 'error');
+          }
+        })
+        .catch(err => showToast('Erreur: ' + err, 'error'));
+    }
+  });
+
+  // Close modal on overlay click
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeDeleteModal();
+    }
+  });
+</script>

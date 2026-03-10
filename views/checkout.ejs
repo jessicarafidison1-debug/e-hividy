@@ -13,7 +13,7 @@
         <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
       </a>
     </div>
-    
+
     <div class="nav-search">
       <form action="/" method="GET">
         <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
@@ -35,126 +35,215 @@
     </ul>
   </nav>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <script>
     function toggleMenu() {
       const menu = document.getElementById('navMenu');
       menu.classList.toggle('active');
     }
-    
-    lucide.createIcons();
+
+    // Initialize Lucide icons after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Lucide icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      // Phone number formatting and validation
+      const phoneInput = document.getElementById('phone');
+      if (phoneInput) {
+        // Format phone number as user types
+        phoneInput.addEventListener('input', function(e) {
+          let value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+          if (value.length > 10) value = value.slice(0, 10); // Limit to 10 digits
+
+          // Format as: 032 59 25 712
+          if (value.length >= 3 && value.length < 6) {
+            value = value.slice(0, 3) + ' ' + value.slice(3);
+          } else if (value.length >= 6 && value.length < 8) {
+            value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
+          } else if (value.length >= 8) {
+            value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6, 8) + ' ' + value.slice(8, 10);
+          }
+
+          e.target.value = value;
+        });
+
+        // Validate on form submit
+        const form = phoneInput.closest('form');
+        if (form) {
+          form.addEventListener('submit', function(e) {
+            const phoneValue = phoneInput.value.replace(/\D/g, '');
+            if (phoneValue.length !== 10) {
+              e.preventDefault();
+              showToast('Veuillez entrer un numéro de téléphone valide (10 chiffres)', 'error');
+              phoneInput.focus();
+              return false;
+            }
+          });
+        }
+      }
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer') || createToastContainer();
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+          <p class="toast-message">${message}</p>
+        </div>
+        <button class="toast-close" onclick="hideToast(this.parentElement)">&times;</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        hideToast(toast);
+      }, 5000);
+    }
+
+    function hideToast(toast) {
+      toast.classList.add('toast-hiding');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }
+
+    function createToastContainer() {
+      const container = document.createElement('div');
+      container.id = 'toastContainer';
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+      return container;
+    }
   </script>
 
   <main>
     <div class="checkout-container">
       <h2>Paiement</h2>
-      <script src="https://unpkg.com/lucide@latest"></script>
-      
+
       <% if (message) { %>
-        <div class="success-message"><%= message %></div>
-        <% if (message.includes('Commande passée')) { %>
-          <a href="/" class="btn">Retourner à la boutique</a>
-        <% } else { %>
-      <% } %>
-      <% } %>
-      
-      <% if (cartItems.length > 0) { %>
-        <div class="checkout-content">
-          <div class="order-summary">
-            <h3>Résumé de la commande</h3>
-            <h4 class="phone-title">Numéro téléphone:</h4>
-            <div class="phone-numbers">
-              <div class="phone-item">
-                <i data-lucide="phone"></i>
-                <span>032 59 25 712</span>
-              </div>
-              <div class="phone-item">
-                <i data-lucide="phone"></i>
-                <span>034 71 33 317</span>
-              </div>
-              <div class="phone-item">
-                <i data-lucide="phone"></i>
-                <span>033 12 88 367</span>
-              </div>
-            </div>
-            <div class="summary-items">
-              <% cartItems.forEach(item => { %>
-                <div class="summary-item">
-                  <span><%= item.name %> (x<%= item.quantity %>)</span>
-                  <span>Ar<%= (item.price * item.quantity).toFixed(2) %></span>
-                </div>
-              <% }); %>
-            </div>
-            <div class="summary-subtotal">
-              <span>Sous-total : </span>
-              <span>Ar<%= total.toFixed(2) %></span>
-            </div>
-            <% if (typeof discountPercent !== 'undefined' && discountPercent > 0) { %>
-            <div class="summary-discount">
-              <span>
-                <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
-                Réduction première commande (<%= discountPercent %>%) :
-              </span>
-              <span>- Ar<%= discountAmount.toFixed(2) %></span>
-            </div>
-            <% } %>
-            <div class="summary-shipping">
-              <span>
-                <% if (shippingFee === 0) { %>
-                  <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
-                  Frais de livraison (Offert dès 200 000 Ar) :
-                <% } else { %>
-                  Frais de livraison :
-                <% } %>
-              </span>
-              <span class="<%= shippingFee === 0 ? 'shipping-free' : '' %>">
-                <% if (shippingFee === 0) { %>
-                  GRATUITE
-                <% } else { %>
-                  Ar<%= shippingFee.toFixed(2) %>
-                <% } %>
-              </span>
-            </div>
-            <div class="summary-total">
-              <strong>Total : Ar<%= (total - (typeof discountAmount !== 'undefined' ? discountAmount : 0) + shippingFee).toFixed(2) %></strong>
-            </div>
-          </div>
-
-          <form method="POST" action="/checkout/place-order" class="checkout-form">
-            <fieldset>
-              <legend>Informations de livraison</legend>
-              
-              <div class="form-group">
-                <label for="address">Adresse :</label>
-                <input type="text" id="address" name="address" required>
-              </div>
-
-              <div class="form-group">
-                <label for="city">Ville :</label>
-                <input type="text" id="city" name="city" required>
-              </div>
-
-              <div class="form-group">
-                <label for="state">Province :</label>
-                <input type="text" id="state" name="state" required>
-              </div>
-
-              <div class="form-group">
-                <label for="zip">Code postal :</label>
-                <input type="text" id="zip" name="zip" required>
-              </div>
-              <div class="form-group">
-                <label for="phone">Numéro téléphone :</label>
-                <input type="tel" id="phone" name="phone" placeholder="032 59 25 712" pattern="[0-9]{10}" required>
-              </div>
-            </fieldset>
-
-            <div class="form-actions">
-              <a href="/cart" class="btn">Retourner au panier</a>
-              <button type="submit" class="btn btn-primary">Passer la commande</button>
-            </div>
-          </form>
+        <div class="success-message">
+          <%= message %>
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="/" class="btn">← Continuer vos achats</a>
+          <a href="/user/account" class="btn btn-primary">Voir mes commandes</a>
         </div>
       <% } %>
+
+      <% 
+        var msg = message || '';
+        var showMessage = msg.indexOf('✅') === -1;
+        if (cartItems.length > 0 && showMessage) { 
+      %>
+
+        <!-- Direct checkout -->
+        <div class="checkout-content">
+          <div class="order-summary">
+              <h3>Résumé de la commande</h3>
+              <h4 class="phone-title">Numéro téléphone:</h4>
+              <div class="phone-numbers">
+                <div class="phone-item">
+                  <i data-lucide="phone"></i>
+                  <span>032 59 25 712</span>
+                </div>
+                <div class="phone-item">
+                  <i data-lucide="phone"></i>
+                  <span>034 71 33 317</span>
+                </div>
+                <div class="phone-item">
+                  <i data-lucide="phone"></i>
+                  <span>033 12 88 367</span>
+                </div>
+              </div>
+              <div class="summary-items">
+                <% cartItems.forEach(item => { %>
+                  <div class="summary-item">
+                    <span><%= item.name %> (x<%= item.quantity %>)</span>
+                    <span>Ar<%= (item.price * item.quantity).toFixed(2) %></span>
+                  </div>
+                <% }); %>
+              </div>
+              <div class="summary-subtotal">
+                <span>Sous-total : </span>
+                <span>Ar<%= total.toFixed(2) %></span>
+              </div>
+              <% if (typeof discountPercent !== 'undefined' && discountPercent > 0) { %>
+              <div class="summary-discount">
+                <span>
+                  <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
+                  Réduction première commande (<%= discountPercent %>%) :
+                </span>
+                <span>- Ar<%= discountAmount.toFixed(2) %></span>
+              </div>
+              <% } %>
+              <div class="summary-shipping">
+                <span>
+                  <% if (shippingFee === 0) { %>
+                    <i data-lucide="gift" style="width: 16px; height: 16px; margin-right: 4px; vertical-align: middle;"></i>
+                    Frais de livraison (Offert dès 200 000 Ar) :
+                  <% } else { %>
+                    Frais de livraison :
+                  <% } %>
+                </span>
+                <span class="<%= shippingFee === 0 ? 'shipping-free' : '' %>">
+                  <% if (shippingFee === 0) { %>
+                    GRATUITE
+                  <% } else { %>
+                    Ar<%= shippingFee.toFixed(2) %>
+                  <% } %>
+                </span>
+              </div>
+              <div class="summary-total">
+                <strong>Total : Ar<%= (total - (typeof discountAmount !== 'undefined' ? discountAmount : 0) + shippingFee).toFixed(2) %></strong>
+              </div>
+            </div>
+
+            <form method="POST" action="/checkout/process" class="checkout-form">
+              <fieldset>
+                <legend>Informations de livraison</legend>
+
+                <div class="form-group">
+                  <label for="address">Adresse :</label>
+                  <input type="text" id="address" name="address" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="city">Ville :</label>
+                  <input type="text" id="city" name="city" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="state">Province :</label>
+                  <input type="text" id="state" name="state" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="zip">Code postal :</label>
+                  <input type="text" id="zip" name="zip" required>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Numéro téléphone :</label>
+                  <input type="tel" id="phone" name="phone" placeholder="032 59 25 712" pattern="[0-9\s]{10,13}" title="Veuillez entrer un numéro de téléphone valide (10 chiffres)" required>
+                  <small style="color: #666; font-size: 0.85rem;">Format attendu : 032 59 25 712</small>
+                </div>
+              </fieldset>
+
+              <div class="form-actions">
+                <a href="/cart" class="btn">Retourner au panier</a>
+                <button type="submit" class="btn btn-primary">Procéder au paiement</button>
+              </div>
+            </form>
+          </div>
+        <% } %>
     </div>
   </main>
 
@@ -354,5 +443,7 @@
       }
     }
   </style>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

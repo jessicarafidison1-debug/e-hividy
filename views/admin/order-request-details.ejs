@@ -1,22 +1,20 @@
-<%- include('partials/head', { title: 'Commande #' + order.id }) %>
-<%- include('partials/sidebar', { activePage: 'orders' }) %>
+<%- include('partials/head', { title: 'Demande #' + request.id }) %>
+<%- include('partials/sidebar', { activePage: 'order-requests' }) %>
 
 <main class="admin-main">
   <div class="page-header">
     <div class="header-with-status">
       <h1 class="m-0">
-        <i data-lucide="receipt"></i> Commande #<%= order.id %>
+        <i data-lucide="file-check"></i> Demande #<%= request.id %>
       </h1>
       <%
         const statusMap = {
-          'completed': { icon: 'check-circle', class: 'status-completed', label: 'Complétée' },
+          'completed': { icon: 'check-circle', class: 'status-completed', label: 'Completée' },
           'pending': { icon: 'clock', class: 'status-pending', label: 'En attente' },
-          'processing': { icon: 'package', class: 'status-processing', label: 'En traitement' },
-          'shipped': { icon: 'truck', class: 'status-shipped', label: 'Expédiée' },
-          'cancelled': { icon: 'x-circle', class: 'status-cancelled', label: 'Annulée' },
-          'failed': { icon: 'alert-circle', class: 'status-failed', label: 'Échouée' }
+          'approved': { icon: 'thumbs-up', class: 'status-approved', label: 'Approuvée - En attente validation admin' },
+          'cancelled': { icon: 'x-circle', class: 'status-cancelled', label: 'Annulée' }
         };
-        const statusInfo = statusMap[order.status] || { icon: 'file-text', class: '', label: order.status };
+        const statusInfo = statusMap[request.status] || { icon: 'file-text', class: '', label: request.status };
       %>
       <span class="status-badge <%= statusInfo.class %> status-badge-lg">
         <i data-lucide="<%= statusInfo.icon %>"></i>
@@ -24,24 +22,24 @@
       </span>
     </div>
     <div class="page-header-actions">
-      <% if (order.status === 'pending') { %>
-        <button class="admin-btn admin-btn-success" onclick="approveOrder()">
-          <i data-lucide="check"></i> Valider la commande
+      <% if (request.status === 'pending') { %>
+        <button class="admin-btn admin-btn-success" onclick="approveRequest()">
+          <i data-lucide="check"></i> Valider la demande
         </button>
-        <button class="admin-btn admin-btn-danger" onclick="cancelOrder()">
-          <i data-lucide="x"></i> Annuler la commande
+        <button class="admin-btn admin-btn-danger" onclick="cancelRequest()">
+          <i data-lucide="x"></i> Annuler la demande
         </button>
       <% } %>
       <button class="admin-btn admin-btn-secondary" onclick="window.print()">
         <i data-lucide="printer"></i> Imprimer
       </button>
-      <a href="/admin/orders" class="admin-btn admin-btn-secondary">
+      <a href="/admin/order-requests" class="admin-btn admin-btn-secondary">
         <i data-lucide="arrow-left"></i> Retour
       </a>
     </div>
   </div>
 
-  <!-- Order Info Grid -->
+  <!-- Request Info Grid -->
   <div class="order-info-grid">
     <!-- Customer Information -->
     <div class="info-card">
@@ -68,7 +66,7 @@
             <i data-lucide="phone" style="width: 14px; height: 14px; margin-right: 6px;"></i>
             Téléphone
           </span>
-          <span class="value phone-value"><%= order.phone || 'N/A' %></span>
+          <span class="value phone-value"><%= request.phone || 'N/A' %></span>
         </div>
         <div class="info-item">
           <span class="label">
@@ -76,36 +74,49 @@
             Adresse de livraison
           </span>
           <span class="value address-value">
-            <%= order.address || customer.address || 'N/A' %><br>
-            <%= order.city || customer.city || 'N/A' %>,
-            <%= order.state || customer.state || 'N/A' %>
-            <%= order.zip || customer.zip || 'N/A' %>
+            <%= request.address %><br>
+            <%= request.city %>,
+            <%= request.state %>
+            <%= request.zip %>
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Order Summary -->
+    <!-- Request Summary -->
     <div class="info-card">
       <div class="info-card-header">
-        <h3><i data-lucide="info"></i> Détails de la commande</h3>
+        <h3><i data-lucide="info"></i> Détails de la demande</h3>
       </div>
       <div class="info-list">
         <div class="info-item">
           <span class="label">
             <i data-lucide="hash" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Numéro de commande
+            Numéro de demande
           </span>
-          <span class="value order-id-large">#<%= order.id %></span>
+          <span class="value order-id-large">#<%= request.id %></span>
         </div>
         <div class="info-item">
           <span class="label">
             <i data-lucide="calendar" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Passée le
+            Soumise le
           </span>
           <span class="value">
-            <span class="order-date-display"><%= formatDate(order.created_at) %></span>
-            <span class="order-time-display"><%= formatTime(order.created_at) %></span>
+            <span class="order-date-display"><%= formatDate(request.created_at) %></span>
+            <span class="order-time-display"><%= formatTime(request.created_at) %></span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">
+            <i data-lucide="percent" style="width: 14px; height: 14px; margin-right: 6px;"></i>
+            Réduction première commande
+          </span>
+          <span class="value">
+            <% if (request.discount_percent > 0) { %>
+              <span class="status-badge status-success"><%= request.discount_percent %>%</span>
+            <% } else { %>
+              <span class="status-badge status-secondary">0%</span>
+            <% } %>
           </span>
         </div>
         <div class="info-item">
@@ -113,28 +124,16 @@
             <i data-lucide="dollar-sign" style="width: 14px; height: 14px; margin-right: 6px;"></i>
             Montant total
           </span>
-          <span class="value total-amount">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
-        </div>
-        <div class="info-item">
-          <span class="label">
-            <i data-lucide="credit-card" style="width: 14px; height: 14px; margin-right: 6px;"></i>
-            Statut de paiement
-          </span>
-          <span class="value">
-            <span class="status-badge status-success payment-badge">
-              <i data-lucide="check-circle"></i>
-              PAYÉE
-            </span>
-          </span>
+          <span class="value total-amount">Ar<%= parseFloat(request.total_amount).toFixed(2) %></span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Order Items Card -->
+  <!-- Request Items Card -->
   <div class="card mb-4">
     <div class="card-header">
-      <h2><i data-lucide="shopping-cart"></i> Articles de la commande</h2>
+      <h2><i data-lucide="shopping-cart"></i> Articles de la demande</h2>
       <span class="items-count"><%= items.length %> article<%= items.length !== 1 ? 's' : '' %></span>
     </div>
     <div class="card-body" style="padding: 0;">
@@ -180,21 +179,26 @@
               <span class="value">Ar<%= items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0).toFixed(2) %></span>
             </div>
             <% const subtotal = items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0); %>
-            <% const shippingFee = subtotal >= 200000 ? 0 : 4000; %>
+            <div class="summary-row">
+              <span class="label">
+                Réduction (<%= request.discount_percent %>%)
+              </span>
+              <span class="value text-success">- Ar<%= parseFloat(request.discount_amount).toFixed(2) %></span>
+            </div>
             <div class="summary-row">
               <span class="label">
                 Frais de livraison
-                <% if (shippingFee === 0) { %>
+                <% if (request.shipping_fee === 0) { %>
                   <span style="font-size: 0.75rem; color: var(--success); font-weight: 400; margin-left: 4px;">(Offert dès 200 000 Ar)</span>
                 <% } %>
               </span>
-              <span class="value <%= shippingFee === 0 ? 'shipping-free' : 'shipping-fee' %>">
-                <% if (shippingFee === 0) { %>
+              <span class="value <%= request.shipping_fee === 0 ? 'shipping-free' : 'shipping-fee' %>">
+                <% if (request.shipping_fee === 0) { %>
                   <i data-lucide="gift"></i>
                   GRATUITE
                 <% } else { %>
                   <i data-lucide="truck"></i>
-                  Ar<%= shippingFee.toFixed(2) %>
+                  Ar<%= parseFloat(request.shipping_fee).toFixed(2) %>
                 <% } %>
               </span>
             </div>
@@ -203,7 +207,7 @@
                 Total
                 <span class="total-label-hint">Tous les impôts inclus</span>
               </span>
-              <span class="value total-value">Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
+              <span class="value total-value">Ar<%= parseFloat(request.total_amount).toFixed(2) %></span>
             </div>
           </div>
         </div>
@@ -211,72 +215,123 @@
     </div>
   </div>
 
+  <!-- Status Info -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i data-lucide="info"></i> Informations sur le statut</h2>
+    </div>
+    <div class="card-body">
+      <div class="status-info-container">
+        <% if (request.status === 'pending') { %>
+          <div class="status-info-item">
+            <div class="status-info-icon">
+              <i data-lucide="clock"></i>
+            </div>
+            <div class="status-info-content">
+              <h4>En attente de validation</h4>
+              <p>Cette demande est en attente de validation par l'administrateur. Une fois approuvée, le client pourra passer sa commande.</p>
+            </div>
+          </div>
+        <% } else if (request.status === 'approved') { %>
+          <div class="status-info-item approved">
+            <div class="status-info-icon">
+              <i data-lucide="check-circle"></i>
+            </div>
+            <div class="status-info-content">
+              <h4>Demande approuvée</h4>
+              <p>Cette demande a été approuvée. Le client peut maintenant passer sa commande.</p>
+              <% if (request.updated_at) { %>
+                <p class="status-info-date">Approuvée le <%= formatDate(request.updated_at) %> à <%= formatTime(request.updated_at) %></p>
+              <% } %>
+            </div>
+          </div>
+        <% } else if (request.status === 'completed') { %>
+          <div class="status-info-item completed">
+            <div class="status-info-icon">
+              <i data-lucide="check-circle"></i>
+            </div>
+            <div class="status-info-content">
+              <h4>Demande complétée</h4>
+              <p>Cette demande a été convertie en commande.</p>
+            </div>
+          </div>
+        <% } else if (request.status === 'cancelled') { %>
+          <div class="status-info-item cancelled">
+            <div class="status-info-icon">
+              <i data-lucide="x-circle"></i>
+            </div>
+            <div class="status-info-content">
+              <h4>Demande annulée</h4>
+              <p>Cette demande a été annulée par l'administrateur.</p>
+              <% if (request.updated_at) { %>
+                <p class="status-info-date">Annulée le <%= formatDate(request.updated_at) %> à <%= formatTime(request.updated_at) %></p>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
   <!-- Timeline Card -->
   <div class="card">
     <div class="card-header">
-      <h2><i data-lucide="history"></i> Chronologie de la commande</h2>
+      <h2><i data-lucide="history"></i> Chronologie de la demande</h2>
     </div>
     <div class="card-body">
       <div class="timeline-container">
         <div class="timeline-item active">
           <div class="timeline-dot">
-            <i data-lucide="shopping-bag"></i>
+            <i data-lucide="file-text"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Commande passée</div>
+            <div class="timeline-title">Demande soumise</div>
             <div class="timeline-date">
-              <%= formatDate(order.created_at) %> à <%= formatTime(order.created_at) %>
+              <%= formatDate(request.created_at) %> à <%= formatTime(request.created_at) %>
             </div>
-            <div class="timeline-description">Le client a terminé le paiement</div>
+            <div class="timeline-description">Le client a soumis la demande</div>
           </div>
         </div>
 
-        <div class="timeline-item <%= order.status !== 'pending' ? 'active' : '' %>">
-          <div class="timeline-dot">
-            <i data-lucide="credit-card"></i>
-          </div>
-          <div class="timeline-content">
-            <div class="timeline-title">Paiement confirmé</div>
-            <div class="timeline-date">Transaction réussie</div>
-            <div class="timeline-description">Le paiement a été traité et vérifié</div>
-          </div>
-        </div>
-
-        <% if (['processing', 'shipped', 'completed'].includes(order.status)) { %>
+        <% if (request.status === 'approved') { %>
         <div class="timeline-item active">
           <div class="timeline-dot">
-            <i data-lucide="package"></i>
+            <i data-lucide="thumbs-up"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">En traitement</div>
-            <div class="timeline-date">Commande en préparation</div>
-            <div class="timeline-description">Articles prélevés et emballés</div>
+            <div class="timeline-title">Demande approuvée</div>
+            <div class="timeline-date">
+              <%= formatDate(request.updated_at) %> à <%= formatTime(request.updated_at) %>
+            </div>
+            <div class="timeline-description">L'administrateur a approuvé la demande</div>
           </div>
         </div>
         <% } %>
 
-        <% if (['shipped', 'completed'].includes(order.status)) { %>
-        <div class="timeline-item active">
-          <div class="timeline-dot">
-            <i data-lucide="truck"></i>
-          </div>
-          <div class="timeline-content">
-            <div class="timeline-title">Expédiée</div>
-            <div class="timeline-date">Commande en transit</div>
-            <div class="timeline-description">En route vers le client</div>
-          </div>
-        </div>
-        <% } %>
-
-        <% if (order.status === 'completed') { %>
+        <% if (request.status === 'completed') { %>
         <div class="timeline-item active">
           <div class="timeline-dot">
             <i data-lucide="check-circle"></i>
           </div>
           <div class="timeline-content">
-            <div class="timeline-title">Livrée</div>
-            <div class="timeline-date">Commande complétée</div>
-            <div class="timeline-description">Le client a reçu la commande</div>
+            <div class="timeline-title">Demande complétée</div>
+            <div class="timeline-date">Commande automatiquement créée</div>
+            <div class="timeline-description">La commande a été générée et payée</div>
+          </div>
+        </div>
+        <% } %>
+
+        <% if (request.status === 'cancelled') { %>
+        <div class="timeline-item active">
+          <div class="timeline-dot">
+            <i data-lucide="x-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-title">Demande annulée</div>
+            <div class="timeline-date">
+              <%= formatDate(request.updated_at) %> à <%= formatTime(request.updated_at) %>
+            </div>
+            <div class="timeline-description">La demande a été annulée</div>
           </div>
         </div>
         <% } %>
@@ -420,11 +475,6 @@
     color: var(--success);
   }
 
-  .payment-badge {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-  }
-
   .items-count {
     font-size: 0.8125rem;
     color: var(--gray-500);
@@ -550,6 +600,96 @@
     color: var(--primary);
   }
 
+  .status-approved {
+    background-color: var(--success-light);
+    color: var(--success);
+    border: 1px solid var(--success);
+  }
+
+  /* Status Info */
+  .status-info-container {
+    padding: 0.5rem 0;
+  }
+
+  .status-info-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    border-left: 4px solid var(--warning);
+  }
+
+  .status-info-item.approved {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, var(--gray-50) 100%);
+    border-left-color: var(--success);
+  }
+
+  .status-info-item.completed {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, var(--gray-50) 100%);
+    border-left-color: var(--success);
+  }
+
+  .status-info-item.cancelled {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, var(--gray-50) 100%);
+    border-left-color: var(--danger);
+  }
+
+  .status-info-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .status-info-item.approved .status-info-icon,
+  .status-info-item.completed .status-info-icon {
+    background: var(--success);
+  }
+
+  .status-info-item.cancelled .status-info-icon {
+    background: var(--danger);
+  }
+
+  .status-info-icon i {
+    width: 24px;
+    height: 24px;
+    color: var(--gray-600);
+  }
+
+  .status-info-item.approved .status-info-icon i,
+  .status-info-item.completed .status-info-icon i {
+    color: white;
+  }
+
+  .status-info-item.cancelled .status-info-icon i {
+    color: white;
+  }
+
+  .status-info-content h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .status-info-content p {
+    font-size: 0.9375rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .status-info-date {
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+    margin-top: 0.75rem !important;
+  }
+
   /* Timeline */
   .timeline-container {
     padding: 0.5rem 0;
@@ -661,6 +801,11 @@
     .summary-breakdown {
       max-width: 100%;
     }
+
+    .status-info-item {
+      flex-direction: column;
+      gap: 1rem;
+    }
   }
 </style>
 
@@ -668,13 +813,13 @@
 <%- include('partials/scripts') %>
 
 <script>
-  function approveOrder() {
-    if (!confirm('Êtes-vous sûr de vouloir valider cette commande ?')) return;
+  function approveRequest() {
+    if (!confirm('Êtes-vous sûr de vouloir valider cette demande ?\nLe client pourra alors passer sa commande.')) return;
 
-    fetch('/admin/orders/<%= order.id %>/approve', {
+    fetch('/admin/order-requests/<%= request.id %>/approve', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId: <%= order.id %> })
+      body: JSON.stringify({ requestId: <%= request.id %> })
     })
     .then(res => {
       if (!res.ok) {
@@ -684,7 +829,7 @@
     })
     .then(data => {
       if (data.success) {
-        alert('✅ Commande #' + <%= order.id %> + ' validée avec succès !\nLe client a été notifié par notification.');
+        alert('✅ Demande #' + <%= request.id %> + ' validée avec succès !\nLe client a été notifié par notification et peut maintenant passer sa commande.');
         window.location.reload();
       } else {
         alert('Erreur: ' + data.message);
@@ -692,20 +837,20 @@
     })
     .catch(err => {
       console.error('Approve error:', err);
-      alert('❌ Erreur lors de la validation de la commande: ' + err.message);
+      alert('❌ Erreur lors de la validation de la demande: ' + err.message);
     });
   }
 
-  function cancelOrder() {
+  function cancelRequest() {
     const reason = prompt('Veuillez entrer la raison de l\'annulation (optionnel) :');
     if (reason === null) return;
 
-    if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?\nLes produits seront remis en stock.')) return;
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette demande ?')) return;
 
-    fetch('/admin/orders/<%= order.id %>/cancel', {
+    fetch('/admin/order-requests/<%= request.id %>/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId: <%= order.id %>, reason })
+      body: JSON.stringify({ requestId: <%= request.id %>, reason })
     })
     .then(res => {
       if (!res.ok) {
@@ -715,7 +860,7 @@
     })
     .then(data => {
       if (data.success) {
-        alert('❌ Commande #' + <%= order.id %> + ' annulée avec succès !\nLes produits ont été remis en stock.\nLe client a été notifié par notification.');
+        alert('❌ Demande #' + <%= request.id %> + ' annulée avec succès !\nLe client a été notifié par notification.');
         window.location.reload();
       } else {
         alert('Erreur: ' + data.message);
@@ -723,7 +868,7 @@
     })
     .catch(err => {
       console.error('Cancel error:', err);
-      alert('❌ Erreur lors de l\'annulation de la commande: ' + err.message);
+      alert('❌ Erreur lors de l\'annulation de la demande: ' + err.message);
     });
   }
 </script>

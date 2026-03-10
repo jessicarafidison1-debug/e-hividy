@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panier d'achat</title>
   <link rel="stylesheet" href="/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav>
@@ -13,7 +14,7 @@
         <img src="/images/logo.jpg" alt="Myeva creation" class="nav-logo">
       </a>
     </div>
-    
+
     <div class="nav-search">
       <form action="/" method="GET">
         <input type="text" name="search" placeholder="Rechercher des produits..." value="<%= typeof search !== 'undefined' ? search : '' %>">
@@ -24,7 +25,7 @@
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <ul id="navMenu">
       <li><a href="/">Accueil</a></li>
-      <% if (user) { %>
+      <% if (typeof user !== 'undefined' && user) { %>
         <li><a href="/user/account">Compte</a></li>
         <li><a href="/cart">Panier</a></li>
         <li><a href="/auth/logout">Déconnexion</a></li>
@@ -40,13 +41,248 @@
       const menu = document.getElementById('navMenu');
       menu.classList.toggle('active');
     }
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('#navMenu a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.remove('active');
+      });
+    });
   </script>
 
+  <style>
+    .cart-page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .cart-page-header h2 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .cart-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .cart-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    .cart-table tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .cart-item-image {
+      width: 80px;
+      height: 80px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cart-item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .placeholder-icon {
+      font-size: 2rem;
+      color: #ccc;
+    }
+
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .remove-btn:hover {
+      background-color: #c82333;
+      transform: translateY(-2px);
+    }
+
+    .cart-summary {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: right;
+    }
+
+    .cart-summary h3 {
+      font-size: 1.5rem;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .cart-summary .total {
+      font-size: 2rem;
+      color: #28a745;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      padding-right: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      width: auto;
+      min-width: auto;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+      color: white;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.35);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-cart-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+
+    .empty-cart p {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .cart-table {
+        font-size: 0.85rem;
+      }
+
+      .cart-table thead {
+        display: none;
+      }
+
+      .cart-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .cart-table td {
+        display: block;
+        padding: 0.75rem;
+        border: none;
+        border-bottom: 1px solid #eee;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+
+      .cart-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding: 0.75rem;
+        font-weight: 600;
+        background-color: #f9f9f9;
+        text-align: left;
+      }
+
+      .cart-item-image {
+        width: 60px;
+        height: 60px;
+      }
+
+      .cart-summary {
+        text-align: center;
+      }
+
+      .cart-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+
   <main>
-    <h2>Panier d'achat</h2>
-    
+    <div class="cart-page-header">
+      <h2>🛒 Panier d'achat</h2>
+    </div>
+
     <% if (cartItems.length > 0) { %>
-      <table>
+      <table class="cart-table">
         <thead>
           <tr>
             <th>Image</th>
@@ -60,7 +296,7 @@
         <tbody>
           <% cartItems.forEach(item => { %>
             <tr>
-              <td>
+              <td data-label="Image">
                 <div class="cart-item-image">
                   <% if (item.image) { %>
                     <img src="<%= item.image %>" alt="<%= item.name %>">
@@ -69,26 +305,31 @@
                   <% } %>
                 </div>
               </td>
-              <td><%= item.name %></td>
-              <td>Ar<%= item.price %></td>
-              <td><%= item.quantity %></td>
-              <td>Ar<%= (item.price * item.quantity).toFixed(2) %></td>
-              <td>
+              <td data-label="Produit"><strong><%= item.name %></strong></td>
+              <td data-label="Prix">Ar<%= item.price.toLocaleString('fr-FR') %></td>
+              <td data-label="Quantité"><%= item.quantity %></td>
+              <td data-label="Sous-total">Ar<%= (item.price * item.quantity).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) %></td>
+              <td data-label="Action">
                 <button class="remove-btn" onclick="removeItem(<%= item.id %>)">Supprimer</button>
               </td>
             </tr>
           <% }); %>
         </tbody>
       </table>
-      
+
       <div class="cart-summary">
-        <h3>Total : Ar<%= total.toFixed(2) %></h3>
-        <a href="/" class="btn">Continuer les achats</a>
-        <a href="/checkout" class="btn btn-primary">Procéder au paiement</a>
+        <h3>Total : <span class="total">Ar<%= total.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) %></span></h3>
+        <div class="cart-actions">
+          <a href="/" class="btn">← Continuer les achats</a>
+          <a href="/checkout" class="btn btn-primary">Procéder au paiement →</a>
+        </div>
       </div>
     <% } else { %>
-      <p class="empty-cart">Votre panier est vide.</p>
-      <a href="/" class="btn">Continuer les achats</a>
+      <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <p>Votre panier est vide.</p>
+        <a href="/" class="btn">Commencer vos achats</a>
+      </div>
     <% } %>
   </main>
 
@@ -99,68 +340,63 @@
           const response = await fetch('/cart/remove/' + cartId, {
             method: 'POST'
           });
-          
+
           if (response.ok) {
-            location.reload();
+            const data = await response.json();
+            if (data.success) {
+              showToast('Article supprimé du panier', 'success');
+              setTimeout(() => location.reload(), 1000);
+            } else {
+              showToast(data.error || 'Erreur lors de la suppression', 'error');
+            }
           } else {
-            alert('Erreur lors de la suppression de l\'article');
+            showToast('Erreur lors de la suppression', 'error');
           }
         } catch (error) {
           console.error('Erreur:', error);
-          alert('Erreur lors de la suppression de l\'article');
+          showToast('Erreur lors de la suppression', 'error');
         }
       }
     }
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+      let container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+          <p class="toast-message">${message}</p>
+        </div>
+        <button class="toast-close" onclick="hideToast(this.parentElement)">&times;</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        hideToast(toast);
+      }, 5000);
+    }
+
+    function hideToast(toast) {
+      toast.classList.add('toast-hiding');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }
   </script>
 
-  <style>
-    .remove-btn {
-      background-color: #dc3545;
-      padding: 0.3rem 0.6rem;
-      font-size: 0.9rem;
-    }
-    
-    .remove-btn:hover {
-      background-color: #c82333;
-    }
-    
-    .cart-summary {
-      margin-top: 2rem;
-      padding: 1.5rem;
-      background: white;
-      border-radius: 8px;
-      text-align: right;
-    }
-    
-    .btn {
-      display: inline-block;
-      margin-left: 1rem;
-      padding: 0.7rem 1.5rem;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .btn:hover {
-      background-color: #0056b3;
-    }
-    
-    .btn-primary {
-      background-color: #28a745;
-    }
-    
-    .btn-primary:hover {
-      background-color: #218838;
-    }
-    
-    .empty-cart {
-      text-align: center;
-      padding: 2rem;
-      font-size: 1.2rem;
-      color: #666;
-    }
-  </style>
+  <%- include('partials/footer') %>
 </body>
 </html>

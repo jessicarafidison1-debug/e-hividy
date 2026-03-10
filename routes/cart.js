@@ -73,9 +73,16 @@ router.post('/add', isAuthenticated, async (req, res) => {
 
     if (totalQtyNeeded > product.stock) {
       connection.release();
-      return res.status(400).json({ 
-        error: `Seulement ${product.stock - currentQtyInCart} article(s) disponible(s) en stock` 
-      });
+      const availableStock = product.stock - currentQtyInCart;
+      if (availableStock <= 0) {
+        return res.status(400).json({
+          error: `⚠️ Stock insuffisant ! Ce produit n'est plus disponible en stock. Stock actuel : ${product.stock}`
+        });
+      } else {
+        return res.status(400).json({
+          error: `⚠️ Stock insuffisant ! Vous ne pouvez ajouter que ${availableStock} article(s) maximum. Stock disponible : ${product.stock}`
+        });
+      }
     }
 
     if (currentQtyInCart > 0) {

@@ -8,6 +8,9 @@
       <p class="text-muted" style="margin: 0.25rem 0 0 0; font-size: 0.9375rem;">Gérez votre catalogue de produits et votre inventaire</p>
     </div>
     <div class="page-header-actions">
+      <button class="admin-btn admin-btn-secondary" onclick="window.print()">
+        <i data-lucide="printer"></i> Imprimer
+      </button>
       <a href="/admin/products/add" class="admin-btn">
         <i data-lucide="plus-circle"></i> Ajouter un produit
       </a>
@@ -39,7 +42,7 @@
             <span class="summary-value text-warning"><%= products.filter(p => p.stock > 0 && p.stock <= 10).length %></span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">En rupture de stock</span>
+            <span class="summary-label">Produit indisponible</span>
             <span class="summary-value text-danger"><%= products.filter(p => p.stock === 0).length %></span>
           </div>
         </div>
@@ -213,6 +216,25 @@
   }
   .empty-state-icon-wrapper .empty-state-icon { width: 40px; height: 40px; color: var(--primary); }
   @media (max-width: 768px) { .products-summary { grid-template-columns: repeat(2, 1fr); } }
+  
+  /* Print styles for products summary */
+  @media print {
+    .products-summary {
+      padding: 1rem !important;
+      margin: 0 !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .summary-item {
+      padding: 0.5rem !important;
+      margin: 0 !important;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .table-responsive {
+      overflow: visible !important;
+    }
+  }
 </style>
 
 <script>

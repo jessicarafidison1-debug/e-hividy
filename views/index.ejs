@@ -618,21 +618,17 @@
       line-height: 1.4;
     }
 
-    .product-rating {
+    .product-stock {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
 
-    .stars {
-      color: var(--warning);
-      font-size: 0.95rem;
-    }
-
-    .rating-count {
-      color: #999;
-      font-size: 0.85rem;
+    .stock-quantity {
+      color: #667eea;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
     .product-price {
@@ -1212,7 +1208,7 @@
               <% } %>
               <div class="product-badges">
                 <% if (product.stock <= 0) { %>
-                  <span class="product-badge badge-sale">En rupture de stock</span>
+                  <span class="product-badge badge-sale">Produit indisponible</span>
                 <% } else if (product.stock < 10) { %>
                   <span class="product-badge badge-new">Stock faible</span>
                 <% } %>
@@ -1225,9 +1221,8 @@
             <div class="product-info">
               <div class="product-category">Produit</div>
               <h3 class="product-title"><%= product.name %></h3>
-              <div class="product-rating">
-                <span class="stars">★★★★☆</span>
-                <span class="rating-count">(0)</span>
+              <div class="product-stock">
+                <span class="stock-quantity"><%= product.stock %> disponible(s)</span>
               </div>
               <div class="product-price">
                 <span class="current-price">Ar<%= parseFloat(product.price).toFixed(2) %></span>
@@ -1235,7 +1230,10 @@
               <div class="product-footer">
                 <a href="/products/<%= product.id %>" class="btn-view">Voir les détails</a>
                 <% if (typeof user !== 'undefined' && user) { %>
-                  <button class="btn-cart" onclick="addToCart(<%= product.id %>)" <%= product.stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '' %>>🛒</button>
+                  <button class="btn-cart" onclick="addToCart(<%= product.id %>, '<%= product.name %>', <%= product.stock %>)" 
+                    <%= product.stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;" title="Produit indisponible"' : '' %>
+                    <%= product.stock > 0 && product.stock <= 5 ? 'title="Attention : stock limité !"' : '' %>
+                  >🛒</button>
                 <% } else { %>
                   <a href="/auth/login-page" class="btn-cart" style="text-decoration:none;">🛒</a>
                 <% } %>
@@ -1359,8 +1357,14 @@
       <% } %>
     }
 
-    function addToCart(productId) {
+    function addToCart(productId, productName, productStock) {
       <% if (typeof user !== 'undefined' && user) { %>
+        // Vérification côté client - Stock indisponible
+        if (productStock === null || productStock === undefined || productStock <= 0) {
+          showToast('❌ Produit indisponible ! Ce produit n\'est plus disponible en stock.', 'error');
+          return;
+        }
+
         fetch('/cart/add', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -1369,12 +1373,13 @@
         .then(r => r.json())
         .then(data => {
           if (data.success) {
-            showToast('Ajouté au panier !', 'success');
+            showToast('✅ Ajouté au panier !', 'success');
           } else {
-            showToast(data.error || 'Erreur lors de l\'ajout au panier', 'error');
+            // Message d'erreur direct et clair
+            showToast(data.error || '⚠️ Erreur : quantité supérieure au stock disponible', 'error');
           }
         })
-        .catch(err => showToast('Erreur : ' + err, 'error'));
+        .catch(err => showToast('❌ Erreur : ' + err, 'error'));
       <% } else { %>
         showToast('Veuillez vous connecter pour ajouter au panier', 'error');
         setTimeout(() => window.location.href = '/auth/login-page', 1000);

@@ -114,6 +114,32 @@
         }
       });
     });
+
+    // Check for pending orders every 30 seconds
+    function checkPendingOrders() {
+      fetch('/admin/api/pending-count')
+        .then(res => res.json())
+        .then(data => {
+          const currentBadge = document.querySelector('.admin-notification-badge');
+          
+          if (data.count > 0) {
+            if (currentBadge) {
+              currentBadge.textContent = data.count;
+            } else {
+              // Badge doesn't exist, need to reload to show it
+              location.reload();
+            }
+          } else {
+            if (currentBadge) {
+              currentBadge.style.display = 'none';
+            }
+          }
+        })
+        .catch(err => console.error('Error checking pending orders:', err));
+    }
+
+    // Check pending orders every 30 seconds
+    setInterval(checkPendingOrders, 30000);
   </script>
 </body>
 </html>

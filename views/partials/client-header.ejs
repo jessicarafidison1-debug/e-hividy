@@ -69,9 +69,9 @@
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    
+
     const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '📦';
-    
+
     toast.innerHTML = `
       <div class="toast-icon">${icon}</div>
       <div class="toast-content">
@@ -80,9 +80,9 @@
       </div>
       <button class="toast-close" onclick="hideToast(this.parentElement)">&times;</button>
     `;
-    
+
     container.appendChild(toast);
-    
+
     // Auto-hide after 5 seconds
     setTimeout(() => {
       hideToast(toast);
@@ -116,8 +116,10 @@
         if (data.success && data.notifications.length > 0) {
           let html = '';
           data.notifications.forEach(notif => {
-            const typeIcon = notif.type === 'order_approved' ? '✅' : notif.type === 'order_cancelled' ? '❌' : '📦';
-            const typeClass = notif.type === 'order_approved' ? 'notif-success' : notif.type === 'order_cancelled' ? 'notif-danger' : 'notif-info';
+            const typeIcon = notif.type === 'order_approved' ? '✅' :
+                             notif.type === 'order_cancelled' ? '❌' : '📦';
+            const typeClass = notif.type === 'order_approved' ? 'notif-success' :
+                              notif.type === 'order_cancelled' ? 'notif-danger' : 'notif-info';
             html += `
               <div style="padding: 1rem; border-bottom: 1px solid #f3f4f6; display: flex; gap: 0.75rem; align-items: flex-start;">
                 <div style="font-size: 1.5rem; flex-shrink: 0;">${typeIcon}</div>
@@ -155,7 +157,7 @@
         updateNotificationBadge(data.count);
       })
       .catch(err => console.error(err));
-    
+
     // Check for new notifications and show toast
     fetch('/user/api/latest-notification')
       .then(res => res.json())
@@ -163,7 +165,7 @@
         if (data.success && data.notification) {
           // Only show toast if this is a new notification we haven't shown before
           if (lastNotificationId !== data.notification.id) {
-            const type = data.notification.type === 'order_approved' ? 'success' : 
+            const type = data.notification.type === 'order_approved' ? 'success' :
                          data.notification.type === 'order_cancelled' ? 'error' : 'info';
             showToast(data.notification.title, data.notification.message, type);
             lastNotificationId = data.notification.id;
@@ -176,11 +178,11 @@
   function updateNotificationBadge(count) {
     const badge = document.getElementById('notificationBadge');
     const accountBadge = document.getElementById('accountNotificationBadge');
-    
+
     if (count > 0) {
       badge.style.display = 'inline-block';
       badge.textContent = Math.min(count, 99);
-      
+
       // Show red dot on account button
       accountBadge.style.display = 'block';
     } else {

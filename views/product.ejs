@@ -488,7 +488,7 @@
           </div>
         <% } else { %>
           <div class="stock-status stock-out">
-            <span>✗</span> En rupture de stock
+            <span>✗</span> Produit indisponible
           </div>
         <% } %>
 
@@ -508,8 +508,10 @@
           </div>
 
           <div class="action-buttons">
-            <button class="btn-add-cart" onclick="addToCart()" <%= product.stock <= 0 ? 'disabled' : '' %>>
-              🛌 Ajouter au panier
+            <button class="btn-add-cart" onclick="addToCart()" 
+              <%= product.stock <= 0 ? 'disabled title="Produit indisponible"' : 'title="Ajouter au panier"' %>
+            >
+              🛌 <%= product.stock <= 0 ? 'Produit indisponible' : 'Ajouter au panier' %>
             </button>
             <button class="btn-wishlist" onclick="toggleWishlist()" id="wishlistBtn">
               ♡
@@ -534,7 +536,7 @@
           </div>
           <div class="meta-item">
             <span class="meta-label">Disponibilité :</span>
-            <span class="meta-value"><%= product.stock > 0 ? 'En stock' : 'En rupture de stock' %></span>
+            <span class="meta-value"><%= product.stock > 0 ? 'En stock' : 'Produit indisponible' %></span>
           </div>
         </div>
 
@@ -632,6 +634,19 @@
     function addToCart() {
       const quantity = document.getElementById('quantity').value;
       const productId = '<%= product.id %>';
+      const maxStock = <%= product.stock %>;
+
+      // Vérification côté client - Stock indisponible
+      if (maxStock === null || maxStock === undefined || maxStock <= 0) {
+        showToast('❌ Produit indisponible ! Ce produit n\'est plus disponible en stock.', 'error');
+        return;
+      }
+
+      // Vérification côté client avant envoi
+      if (parseInt(quantity) > maxStock) {
+        showToast(`⚠️ Stock insuffisant ! La quantité demandée (${quantity}) dépasse le stock disponible (${maxStock}).`, 'error');
+        return;
+      }
 
       fetch('/cart/add', {
         method: 'POST',
@@ -641,12 +656,13 @@
       .then(r => r.json())
       .then(data => {
         if (data.success) {
-          showToast('Ajouté au panier !', 'success');
+          showToast('✅ Ajouté au panier !', 'success');
         } else {
-          showToast(data.error || 'Erreur lors de l\'ajout au panier', 'error');
+          // Message d'erreur direct et clair
+          showToast(data.error || '⚠️ Erreur : quantité supérieure au stock disponible', 'error');
         }
       })
-      .catch(err => showToast('Erreur : ' + err, 'error'));
+      .catch(err => showToast('❌ Erreur : ' + err, 'error'));
     }
 
     // Wishlist
@@ -688,5 +704,7 @@
       }
     }
   </script>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

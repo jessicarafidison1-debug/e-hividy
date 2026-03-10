@@ -171,11 +171,44 @@
   <main>
     <div class="order-container">
       <a href="/user/account" class="back-btn">← Retourner au compte</a>
-      
+
       <div class="order-header">
         <h1>Commande n°<%= order.id %></h1>
-        <span class="status-badge"><%= order.status %></span>
+        <%
+          const statusMap = {
+            'pending': { class: 'status-pending', label: 'En attente de validation', icon: '⏳' },
+            'completed': { class: 'status-completed', label: 'Validée', icon: '✅' },
+            'cancelled': { class: 'status-cancelled', label: 'Annulée', icon: '❌' },
+            'processing': { class: 'status-processing', label: 'En traitement', icon: '📦' },
+            'shipped': { class: 'status-shipped', label: 'Expédiée', icon: '🚚' },
+            'failed': { class: 'status-failed', label: 'Échouée', icon: '⚠️' }
+          };
+          const statusInfo = statusMap[order.status] || { class: '', label: order.status, icon: '📄' };
+        %>
+        <span class="status-badge <%= statusInfo.class %>"><%= statusInfo.icon %> <%= statusInfo.label %></span>
       </div>
+
+      <% if (order.status === 'pending') { %>
+        <div class="order-actions" style="margin-bottom: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+          <button onclick="cancelOrder()" class="btn-cancel-order" style="background-color: #dc3545; color: white; padding: 0.7rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;">
+            ❌ Annuler la commande
+          </button>
+        </div>
+      <% } %>
+
+      <% if (order.status === 'pending') { %>
+        <div class="alert alert-warning" style="margin-bottom: 2rem; padding: 1rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; color: #856404;">
+          <strong>⏳ Commande en attente :</strong> Votre commande est en cours de validation par notre équipe. Vous recevrez une notification une fois qu'elle sera validée.
+        </div>
+      <% } else if (order.status === 'completed') { %>
+        <div class="alert alert-success" style="margin-bottom: 2rem; padding: 1rem; background: #d4edda; border: 1px solid #28a745; border-radius: 8px; color: #155724;">
+          <strong>✅ Commande validée :</strong> Votre commande a été validée et est en cours de préparation.
+        </div>
+      <% } else if (order.status === 'cancelled') { %>
+        <div class="alert alert-danger" style="margin-bottom: 2rem; padding: 1rem; background: #f8d7da; border: 1px solid #dc3545; border-radius: 8px; color: #721c24;">
+          <strong>❌ Commande annulée :</strong> Votre commande a été annulée. Les produits ont été remis en stock.
+        </div>
+      <% } %>
 
       <div class="info-grid">
         <div class="info-box">
@@ -198,6 +231,14 @@
             <div class="info-value">
               <%= order.address %><br>
               <%= order.city %>, <%= order.state %> <%= order.zip %>
+            </div>
+          </div>
+        </div>
+        <div class="info-box">
+          <h3>Téléphone</h3>
+          <div class="info-item">
+            <div class="info-value" style="font-weight: bold; color: #007bff;">
+              <%= order.phone || 'N/A' %>
             </div>
           </div>
         </div>
@@ -242,11 +283,191 @@
           <span>Ar<%= parseFloat(order.total_amount).toFixed(2) %></span>
         </div>
       </div>
+
+      <!-- Order Timeline -->
+      <div class="timeline-box" style="margin-top: 2rem;">
+        <h2>Chronologie de la commande</h2>
+        <div class="timeline">
+          <div class="timeline-item active">
+            <div class="timeline-dot">🛍️</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Commande passée</div>
+              <div class="timeline-date"><%= new Date(order.created_at).toLocaleString('fr-FR') %></div>
+              <div class="timeline-description">Votre commande a été créée avec succès</div>
+            </div>
+          </div>
+          <% if (order.status !== 'pending') { %>
+          <div class="timeline-item active">
+            <div class="timeline-dot">✅</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Commande validée</div>
+              <div class="timeline-date">Validée par l'administrateur</div>
+              <div class="timeline-description">Votre commande a été confirmée</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (order.status === 'completed' || order.status === 'processing' || order.status === 'shipped') { %>
+          <div class="timeline-item active">
+            <div class="timeline-dot">📦</div>
+            <div class="timeline-content">
+              <div class="timeline-title">En traitement</div>
+              <div class="timeline-date">Commande en préparation</div>
+              <div class="timeline-description">Articles prélevés et emballés</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (order.status === 'shipped' || order.status === 'completed') { %>
+          <div class="timeline-item active">
+            <div class="timeline-dot">🚚</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Expédiée</div>
+              <div class="timeline-date">Commande en transit</div>
+              <div class="timeline-description">En route vers vous</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (order.status === 'completed') { %>
+          <div class="timeline-item active">
+            <div class="timeline-dot">✓</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Livrée</div>
+              <div class="timeline-date">Commande complétée</div>
+              <div class="timeline-description">Vous avez reçu votre commande</div>
+            </div>
+          </div>
+          <% } %>
+          <% if (order.status === 'cancelled') { %>
+          <div class="timeline-item active">
+            <div class="timeline-dot">❌</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Annulée</div>
+              <div class="timeline-date">Commande annulée</div>
+              <div class="timeline-description">La commande a été annulée</div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
     </div>
   </main>
 
   <footer>
     <p>&copy; 2026 Shop. Tous droits réservés.</p>
   </footer>
+
+  <style>
+    .timeline-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-box h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 2rem;
+      padding-left: 1.5rem;
+      border-left: 2px solid #e0e0e0;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+      border-left-color: transparent;
+    }
+
+    .timeline-item.active {
+      border-left-color: #28a745;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2.375rem;
+      top: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      z-index: 1;
+    }
+
+    .timeline-item.active .timeline-dot {
+      background: #28a745;
+      border-color: #28a745;
+    }
+
+    .timeline-content {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .timeline-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-date {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-description {
+      font-size: 0.875rem;
+      color: #555;
+      background: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .btn-cancel-order:hover {
+      background-color: #c82333 !important;
+    }
+  </style>
+
+  <script>
+    function cancelOrder() {
+      const reason = prompt('Veuillez entrer la raison de l\'annulation (optionnel) :');
+      if (reason === null) return;
+
+      if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?\nLes produits seront remis en stock.')) return;
+
+      fetch('/user/order/<%= order.id %>/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: <%= order.id %>, reason: reason || '' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('❌ Commande #' + <%= order.id %> + ' annulée avec succès !\nLes produits ont été remis en stock.');
+          window.location.reload();
+        } else {
+          alert('Erreur: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Cancel error:', err);
+        alert('❌ Erreur lors de l\'annulation de la commande: ' + err.message);
+      });
+    }
+  </script>
 </body>
 </html>
